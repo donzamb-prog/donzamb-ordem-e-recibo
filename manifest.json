@@ -1,0 +1,21 @@
+{
+  "name": "DONZAMB@ - Soluções Técnicas",
+  "short_name": "DONZAMB@",
+  "description": "Sistema de Ordem de Serviço e Recibos",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1e1e1e",
+  "theme_color": "#ff7700",
+  "icons": [
+    {
+      "src": "logo-esquerda.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo-esquerda.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
