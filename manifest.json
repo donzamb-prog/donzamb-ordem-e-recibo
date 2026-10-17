@@ -8,12 +8,12 @@
   "theme_color": "#ff7700",
   "icons": [
     {
-      "src": "logo-esquerda.png",
+      "src": "logoesquerda.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "logo-esquerda.png",
+      "src": "logoesquerda.png",
       "sizes": "512x512",
       "type": "image/png"
     }
