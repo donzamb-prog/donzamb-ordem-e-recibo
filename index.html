@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#ff7700">
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DONZAMB@ - Ordem de Serviço e Recibos</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff7700">
+  <title id="page-title">DONZAMB@ - Ordem de Serviço e Recibos</title>
   <style>
     :root {
       --bg-dark: #1e1e1e;
@@ -255,19 +254,31 @@
       margin-bottom: 4px;
     }
 
+    /* ASSINATURA - Oculta por padrão no App, visível no Print */
+    .signature-area {
+      display: none;
+      margin-top: 25px;
+    }
+
     .signature-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 15px;
+      gap: 20px;
       text-align: center;
     }
 
     .signature-line {
-      border-top: 1px solid var(--text-muted);
-      margin-top: 30px;
+      border-top: 1px solid #000;
+      margin-top: 35px;
       padding-top: 5px;
       font-size: 0.85rem;
+      font-weight: bold;
+      color: #000;
+    }
+
+    /* RECIBO CONTAINER IMPRESSÃO */
+    #recibo-print-template {
+      display: none;
     }
 
     /* RODAPÉ */
@@ -325,20 +336,22 @@
     .btn-print { background-color: var(--accent-orange); color: black; }
     .btn-clear { background-color: #dc3545; color: white; }
 
-    /* ESTILO DE IMPRESSÃO (PDF) */
+    /* ESTILO DE IMPRESSÃO (PDF / PRINT) */
     @media print {
       body {
         background-color: white !important;
         color: black !important;
-        padding: 0;
+        padding: 0 !important;
+        margin: 0 !important;
       }
-      header, .section-box, details, footer {
+      header, .section-box, details, footer, #recibo-print-template {
         background-color: white !important;
         color: black !important;
-        border: 1px solid #ccc !important;
+        border: 1px solid #999 !important;
         box-shadow: none !important;
+        page-break-inside: avoid;
       }
-      .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente {
+      .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper {
         display: none !important;
       }
       details {
@@ -346,13 +359,23 @@
       }
       details summary {
         color: black !important;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
+      }
+      .terms-box {
+        max-height: none !important;
+        overflow: visible !important;
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+      }
+      .signature-area {
+        display: block !important;
       }
       input, select, textarea {
         background-color: white !important;
         color: black !important;
         border: none !important;
-        border-bottom: 1px solid #000 !important;
+        border-bottom: 1px solid #333 !important;
         border-radius: 0 !important;
       }
       .header-title, .section-title, summary {
@@ -360,6 +383,17 @@
       }
       .qr-code-img {
         border: 1px solid #000;
+      }
+      
+      /* Quando estiver imprimindo a aba Recibo, esconde a OS */
+      body.printing-recibo #ordem-servico {
+        display: none !important;
+      }
+      body.printing-recibo #emitir-recibo-form {
+        display: none !important;
+      }
+      body.printing-recibo #recibo-print-template {
+        display: block !important;
       }
     }
   </style>
@@ -393,18 +427,18 @@
       <div class="grid-2">
         <div class="form-group">
           <label>Data:</label>
-          <input type="text" id="data-pedido" readonly>
+          <input type="text" id="data-pedido">
         </div>
         <div class="form-group">
-          <label>Pedido nº:</label>
-          <input type="text" id="numero-pedido" readonly style="color: var(--accent-orange); font-weight: bold;">
+          <label>Pedido nº (editável):</label>
+          <input type="text" id="numero-pedido" style="color: var(--accent-orange); font-weight: bold;">
         </div>
       </div>
     </div>
 
     <div class="section-box">
       <div class="section-title">Dados do Cliente</div>
-      <div class="grid-2" style="margin-bottom: 10px;">
+      <div class="grid-2" id="select-cliente-wrapper" style="margin-bottom: 10px;">
         <div class="form-group">
           <label>Selecione um Cliente Salvo:</label>
           <select id="select-cliente" onchange="carregarCliente(this.value)">
@@ -432,20 +466,20 @@
     <details open>
       <summary>Informações básicas</summary>
       <div class="grid-2">
-        <div class="form-group"><label>Validade do orçamento:</label><input type="text" placeholder="Ex: 7 dias"></div>
-        <div class="form-group"><label>Marca:</label><input type="text"></div>
-        <div class="form-group"><label>Modelo:</label><input type="text"></div>
-        <div class="form-group"><label>Tipo de Aparelho:</label><input type="text"></div>
-        <div class="form-group"><label>Tipo de Equipamento:</label><input type="text"></div>
-        <div class="form-group"><label>Defeito Reclamado:</label><textarea rows="2"></textarea></div>
-        <div class="form-group"><label>Acessórios Deixados:</label><input type="text"></div>
-        <div class="form-group"><label>Observações:</label><textarea rows="2"></textarea></div>
-        <div class="form-group"><label>Outros:</label><input type="text"></div>
+        <div class="form-group"><label>Validade do orçamento:</label><input type="text" id="info-validade" placeholder="Ex: 10 dias"></div>
+        <div class="form-group"><label>Marca:</label><input type="text" id="info-marca"></div>
+        <div class="form-group"><label>Modelo:</label><input type="text" id="info-modelo"></div>
+        <div class="form-group"><label>Tipo de Aparelho:</label><input type="text" id="info-aparelho"></div>
+        <div class="form-group"><label>Tipo de Equipamento:</label><input type="text" id="info-equipamento"></div>
+        <div class="form-group"><label>Defeito Reclamado:</label><textarea id="info-defeito" rows="2"></textarea></div>
+        <div class="form-group"><label>Acessórios Deixados:</label><input type="text" id="info-acessorios"></div>
+        <div class="form-group"><label>Observações:</label><textarea id="info-obs" rows="2"></textarea></div>
+        <div class="form-group"><label>Outros:</label><input type="text" id="info-outros"></div>
       </div>
     </details>
 
     <!-- 2. Detalhes do Pedido -->
-    <details>
+    <details open>
       <summary>Detalhes do Pedido (Itens e Serviços)</summary>
       <div class="form-group" style="margin-bottom: 12px;">
         <label>Valor Visita Técnica (R$):</label>
@@ -453,15 +487,11 @@
       </div>
 
       <div class="section-title">Peças / Componentes</div>
-      <div id="container-pecas">
-        <!-- Linhas dinâmicas de peças -->
-      </div>
+      <div id="container-pecas"></div>
       <button type="button" class="btn-add" onclick="adicionarPeca()">+ Adicionar Peça</button>
 
       <div class="section-title" style="margin-top: 15px;">Serviços Executados</div>
-      <div id="container-servicos">
-        <!-- Linhas dinâmicas de serviços -->
-      </div>
+      <div id="container-servicos"></div>
       <button type="button" class="btn-add" onclick="adicionarServico()">+ Adicionar Serviço</button>
 
       <div class="form-group" style="margin-top: 15px;">
@@ -510,9 +540,9 @@
     <details>
       <summary>Opções de Pagamento</summary>
       <div class="grid-3">
-        <div class="form-group"><label>À vista (R$):</label><input type="number" step="0.01"></div>
-        <div class="form-group"><label>Sinal / Entrada (R$):</label><input type="number" step="0.01"></div>
-        <div class="form-group"><label>Parcelamento / Detalhes:</label><input type="text" placeholder="Ex: 3x de R$ 100,00"></div>
+        <div class="form-group"><label>À vista (R$):</label><input type="number" id="pag-vista" step="0.01"></div>
+        <div class="form-group"><label>Sinal / Entrada (R$):</label><input type="number" id="pag-sinal" step="0.01"></div>
+        <div class="form-group"><label>Parcelamento / Detalhes:</label><input type="text" id="pag-parcelas" placeholder="Ex: 3x de R$ 120,00"></div>
       </div>
     </details>
 
@@ -520,12 +550,12 @@
     <details>
       <summary>Meios de Pagamento (Múltipla escolha)</summary>
       <div class="checkbox-group">
-        <label class="checkbox-item"><input type="checkbox"> Transferência bancária</label>
-        <label class="checkbox-item"><input type="checkbox"> Dinheiro</label>
-        <label class="checkbox-item"><input type="checkbox"> Cheque</label>
-        <label class="checkbox-item"><input type="checkbox"> Cartão de crédito</label>
-        <label class="checkbox-item"><input type="checkbox"> Cartão de débito</label>
-        <label class="checkbox-item"><input type="checkbox"> Pix</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Transferência bancária"> Transferência bancária</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Dinheiro"> Dinheiro</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Cheque"> Cheque</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Cartão de crédito"> Cartão de crédito</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Cartão de débito"> Cartão de débito</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Pix"> Pix</label>
       </div>
     </details>
 
@@ -533,10 +563,10 @@
     <details>
       <summary>Informações adicionais</summary>
       <div class="grid-2">
-        <div class="form-group"><label>Garantia:</label><input type="text" value="90 dias conforme termo"></div>
-        <div class="form-group"><label>Anotações:</label><textarea rows="2"></textarea></div>
-        <div class="form-group"><label>Relatório Técnico:</label><textarea rows="2"></textarea></div>
-        <div class="form-group"><label>Observações Adicionais:</label><textarea rows="2"></textarea></div>
+        <div class="form-group"><label>Garantia:</label><input type="text" id="add-garantia" value="90 dias conforme termo"></div>
+        <div class="form-group"><label>Anotações:</label><textarea id="add-anotacoes" rows="2"></textarea></div>
+        <div class="form-group"><label>Relatório Técnico:</label><textarea id="add-relatorio" rows="2"></textarea></div>
+        <div class="form-group"><label>Observações Adicionais:</label><textarea id="add-obs" rows="2"></textarea></div>
       </div>
     </details>
 
@@ -566,25 +596,28 @@
         <p>Declaro, na condição de proprietário ou representante legal do equipamento, que li, compreendi e concordo integralmente com todas as condições acima descritas, não havendo qualquer ressalva a ser feita no momento da contratação do serviço.</p>
       </div>
 
-      <div class="signature-grid">
-        <div>
-          <label>DATA:</label>
-          <input type="text" id="data-assinatura" placeholder="DD/MM/AAAA">
-        </div>
-        <div>
-          <div class="signature-line">CLIENTE</div>
-        </div>
-        <div>
-          <div class="signature-line">ASSINATURA</div>
+      <!-- ÁREA DE ASSINATURA (Aparece apenas na impressão/PDF) -->
+      <div class="signature-area">
+        <div class="signature-grid">
+          <div>
+            <label style="color:#000; font-weight:bold;">DATA:</label>
+            <input type="text" id="data-assinatura" style="text-align:center;">
+          </div>
+          <div>
+            <div class="signature-line">CLIENTE</div>
+          </div>
+          <div>
+            <div class="signature-line">ASSINATURA</div>
+          </div>
         </div>
       </div>
     </details>
 
-    <!-- BOTOES DE AÇÃO -->
+    <!-- BOTÕES DE AÇÃO OS -->
     <div class="action-buttons">
       <button class="btn-action btn-save" onclick="salvarPedidoHistorico()">SALVAR PEDIDO</button>
-      <button class="btn-action btn-print" onclick="window.print()">GERAR PDF / IMPRIMIR</button>
-      <button class="btn-action btn-share" onclick="compartilharWhatsApp()">COMPARTILHAR WHATSAPP</button>
+      <button class="btn-action btn-print" onclick="imprimirOS()">GERAR PDF / IMPRIMIR</button>
+      <button class="btn-action btn-share" onclick="compartilharWhatsAppOS()">COMPARTILHAR WHATSAPP</button>
       <button class="btn-action btn-clear" onclick="limparFormulario()">LIMPAR DADOS</button>
     </div>
 
@@ -592,7 +625,7 @@
 
   <!-- ABA 2: EMITIR RECIBO -->
   <div id="emitir-recibo" class="tab-content">
-    <div class="section-box">
+    <div class="section-box" id="emitir-recibo-form">
       <div class="section-title">Emissão e Baixa de Recibo</div>
       
       <div class="grid-2">
@@ -604,7 +637,7 @@
         </div>
         <div class="form-group">
           <label>Cliente:</label>
-          <input type="text" id="recibo-cliente" readonly>
+          <input type="text" id="recibo-cliente">
         </div>
         <div class="form-group">
           <label>Valor Total do Pedido (R$):</label>
@@ -618,7 +651,7 @@
 
       <div class="grid-2" style="margin-top: 15px;">
         <div class="form-group">
-          <label>Valor do Pagamento Atual / Baixa (R$):</label>
+          <label>Valor do Pagamento / Baixa Atual (R$):</label>
           <input type="number" id="recibo-val-pagamento" step="0.01" placeholder="0.00">
         </div>
         <div class="form-group">
@@ -629,11 +662,40 @@
             <option>Cartão de Crédito</option>
             <option>Cartão de Débito</option>
             <option>Transferência Bancária</option>
+            <option>Cheque</option>
           </select>
         </div>
       </div>
 
       <button type="button" class="btn-add" style="margin-top: 15px; width: 100%; padding: 12px;" onclick="darBaixaPagamento()">Registrar Baixa de Pagamento</button>
+
+      <!-- BOTÕES DE AÇÃO RECIBO -->
+      <div class="action-buttons" style="margin-top: 20px;">
+        <button class="btn-action btn-print" onclick="imprimirRecibo()">GERAR PDF / IMPRIMIR RECIBO</button>
+        <button class="btn-action btn-share" onclick="compartilharWhatsAppRecibo()">COMPARTILHAR RECIBO WHATSAPP</button>
+      </div>
+    </div>
+
+    <!-- MODELO VISÍVEL DE RECIBO PARA IMPRESSÃO -->
+    <div id="recibo-print-template" class="section-box">
+      <h2 style="text-align:center; color:#000; margin-bottom:15px; text-transform:uppercase;">RECIBO DE PAGAMENTO</h2>
+      <p style="font-size:1.1rem; line-height:1.6; color:#000;" id="recibo-texto-declaracao">
+        Recebi(emos) de <strong id="recibo-p-cliente">____________________</strong> a quantia de 
+        <strong id="recibo-p-valor">R$ 0,00</strong> referente ao pagamento/baixa da Ordem de Serviço nº 
+        <strong id="recibo-p-num">______</strong>.
+      </p>
+      <br>
+      <p style="font-size:1rem; color:#000;"><strong>Saldo Restante do Pedido:</strong> <span id="recibo-p-saldo">R$ 0,00</span></p>
+      <br>
+      <div class="signature-grid" style="margin-top:40px;">
+        <div>
+          <label style="color:#000; font-weight:bold;">DATA:</label>
+          <p id="recibo-p-data" style="font-weight:bold; color:#000;"></p>
+        </div>
+        <div>
+          <div class="signature-line">DONZAMB@ - SOLUÇÕES TÉCNICAS</div>
+        </div>
+      </div>
     </div>
 
     <!-- HISTÓRICO DE RECIBOS DO PEDIDO -->
@@ -669,26 +731,25 @@
 
     // CARREGAMENTO INICIAL
     window.onload = function() {
-      // Definir Data Atual
       const hoje = new Date();
       const dataFormatada = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear();
       document.getElementById('data-pedido').value = dataFormatada;
       document.getElementById('data-assinatura').value = dataFormatada;
 
-      // Gerar/Recuperar Número do Pedido
+      // Gerar Número Sequencial Sugerido (Pode ser alterado livremente)
       let numAtual = localStorage.getItem('donzamb_num_pedido') || 1;
       document.getElementById('numero-pedido').value = String(numAtual).padStart(3, '0') + '-' + hoje.getFullYear();
 
-      // Adicionar primeira linha de Peça e Serviço
+      // Adicionar primeira linha inicial de Peça e Serviço
       adicionarPeca();
       adicionarServico();
       
-      // Carregar Clientes e Pedidos salvos
+      // Carregar Clientes e Pedidos salvos na agenda local
       atualizarSelectClientes();
       atualizarSelectPedidosRecibo();
     };
 
-    // GERENCIAMENTO DE LINHAS DINÂMICAS - PEÇAS
+    // LINHAS DINÂMICAS - PEÇAS
     let countPeca = 0;
     function adicionarPeca() {
       countPeca++;
@@ -697,7 +758,7 @@
       div.className = 'dynamic-row';
       div.id = `peca-row-${countPeca}`;
       div.innerHTML = `
-        <input type="text" placeholder="Descrição da Peça ${countPeca}">
+        <input type="text" class="peca-desc" placeholder="Descrição da Peça ${countPeca}">
         <input type="number" class="peca-qtd" value="1" min="1" placeholder="Qtd" style="max-width: 70px;" oninput="calcularTotais()">
         <input type="number" class="peca-val" value="0.00" step="0.01" placeholder="Val. Unit" style="max-width: 100px;" oninput="calcularTotais()">
         <input type="text" class="peca-tot" value="0.00" readonly style="max-width: 100px;">
@@ -707,7 +768,7 @@
       calcularTotais();
     }
 
-    // GERENCIAMENTO DE LINHAS DINÂMICAS - SERVIÇOS
+    // LINHAS DINÂMICAS - SERVIÇOS
     let countServico = 0;
     function adicionarServico() {
       countServico++;
@@ -718,7 +779,7 @@
       div.id = `servico-row-${countServico}`;
       div.innerHTML = `
         <span style="font-weight:bold; color:var(--accent-orange);">${numFormatado}</span>
-        <input type="text" placeholder="Descrição do Serviço ${numFormatado}">
+        <input type="text" class="serv-desc" placeholder="Descrição do Serviço ${numFormatado}">
         <input type="number" class="serv-val" value="0.00" step="0.01" placeholder="Val. Unit" style="max-width: 110px;" oninput="calcularTotais()">
         <button type="button" class="btn-remove" onclick="removerLinha('servico-row-${countServico}')">X</button>
       `;
@@ -734,10 +795,8 @@
 
     // CÁLCULOS AUTOMÁTICOS
     function calcularTotais() {
-      // Visita Técnica
       let visita = parseFloat(document.getElementById('val-visita').value) || 0;
 
-      // Soma Peças
       let totalPecas = 0;
       document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
         let qtd = parseFloat(row.querySelector('.peca-qtd').value) || 0;
@@ -747,41 +806,34 @@
         totalPecas += sub;
       });
 
-      // Soma Serviços
       let totalServicos = 0;
       document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
         let val = parseFloat(row.querySelector('.serv-val').value) || 0;
         totalServicos += val;
       });
 
-      // Subtotal
       let subtotal = visita + totalPecas + totalServicos;
       document.getElementById('subtotal-geral').value = subtotal.toFixed(2);
 
-      // Descontos
       let dVisita = parseFloat(document.getElementById('desc-visita').value) || 0;
       let dPecas = parseFloat(document.getElementById('desc-pecas').value) || 0;
       let dServ = parseFloat(document.getElementById('desc-servicos').value) || 0;
       let totalDesconto = dVisita + dPecas + dServ;
       document.getElementById('total-desconto').value = totalDesconto.toFixed(2);
 
-      // Taxas
       let totalTaxas = 0;
       document.querySelectorAll('.input-taxa').forEach(input => {
         totalTaxas += parseFloat(input.value) || 0;
       });
       document.getElementById('total-taxas').value = totalTaxas.toFixed(2);
 
-      // VALOR LIQUIDO FINAL
       let valorFinal = (subtotal - totalDesconto) + totalTaxas;
       document.getElementById('valor-total-final').value = valorFinal.toFixed(2);
     }
 
-    // AGENDA LOCAL DE CLIENTES (LOCALSTORAGE)
+    // AGENDA LOCAL DE CLIENTES
     function salvarNovoCliente() {
-      let nome = document.getElementById('cli-nome').value;
-      if (!nome) { alert('Digite ao menos o nome do cliente!'); return; }
-
+      let nome = document.getElementById('cli-nome').value || 'Cliente sem nome';
       let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
       let cliente = {
         ref: document.getElementById('cli-referencia').value,
@@ -821,13 +873,11 @@
       }
     }
 
-    // SALVAR PEDIDO NO HISTÓRICO
+    // SALVAR PEDIDO NO HISTÓRICO (SEM DADOS OBRIGATÓRIOS)
     function salvarPedidoHistorico() {
-      let num = document.getElementById('numero-pedido').value;
-      let cliente = document.getElementById('cli-nome').value;
+      let num = document.getElementById('numero-pedido').value || '000';
+      let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
       let total = parseFloat(document.getElementById('valor-total-final').value) || 0;
-
-      if (!cliente) { alert('Preencha o nome do cliente!'); return; }
 
       let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
       let pedido = {
@@ -841,15 +891,87 @@
       pedidos.push(pedido);
       localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
 
-      // Incrementar número do próximo pedido
-      let proxNum = parseInt(num.split('-')[0]) + 1;
-      localStorage.setItem('donzamb_num_pedido', proxNum);
+      // Incrementar contador se for numérico puro
+      let numLimpo = parseInt(num.split('-')[0]);
+      if (!isNaN(numLimpo)) {
+        localStorage.setItem('donzamb_num_pedido', numLimpo + 1);
+      }
 
       alert(`Pedido ${num} salvo com sucesso!`);
       atualizarSelectPedidosRecibo();
     }
 
-    // ABA RECIBOS / BAIXAS
+    // GERAR IMPRESSÃO / PDF COM NOME DO CLIENTE NO ARQUIVO
+    function imprimirOS() {
+      let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
+      document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
+      document.body.classList.remove('printing-recibo');
+      window.print();
+      setTimeout(() => { document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; }, 1000);
+    }
+
+    function imprimirRecibo() {
+      let cliente = document.getElementById('recibo-cliente').value.trim() || 'CLIENTE';
+      document.title = `RECIBO ${cliente.toUpperCase()}`;
+      document.body.classList.add('printing-recibo');
+      window.print();
+      setTimeout(() => { 
+        document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; 
+        document.body.classList.remove('printing-recibo');
+      }, 1000);
+    }
+
+    // COMPARTILHAR ORDEM DE SERVIÇO DETALHADA NO WHATSAPP
+    function compartilharWhatsAppOS() {
+      let num = document.getElementById('numero-pedido').value || '';
+      let cliente = document.getElementById('cli-nome').value || 'Cliente';
+      let aparelho = document.getElementById('info-aparelho').value || '';
+      let marca = document.getElementById('info-marca').value || '';
+      let modelo = document.getElementById('info-modelo').value || '';
+      let defeito = document.getElementById('info-defeito').value || '';
+      let total = document.getElementById('valor-total-final').value || '0.00';
+
+      // Montando lista de peças
+      let pecasTexto = [];
+      document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
+        let desc = row.querySelector('.peca-desc').value;
+        let qtd = row.querySelector('.peca-qtd').value;
+        let val = row.querySelector('.peca-val').value;
+        if(desc) pecasTexto.push(`• ${qtd}x ${desc} (R$ ${val})`);
+      });
+
+      // Montando lista de serviços
+      let servicosTexto = [];
+      document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
+        let desc = row.querySelector('.serv-desc').value;
+        let val = row.querySelector('.serv-val').value;
+        if(desc) servicosTexto.push(`• ${desc} (R$ ${val})`);
+      });
+
+      let msg = `*DONZAMB@ - Soluções Técnicas em T.I.*\n`;
+      msg += `*ORDEM DE SERVIÇO / ORÇAMENTO nº ${num}*\n\n`;
+      msg += `*Cliente:* ${cliente}\n`;
+      if(aparelho || marca || modelo) msg += `*Equipamento:* ${aparelho} ${marca} ${modelo}\n`;
+      if(defeito) msg += `*Defeito Reclamado:* ${defeito}\n`;
+      msg += `\n`;
+
+      if(pecasTexto.length > 0) {
+        msg += `*Peças/Componentes:*\n${pecasTexto.join('\n')}\n\n`;
+      }
+
+      if(servicosTexto.length > 0) {
+        msg += `*Serviços Executados:*\n${servicosTexto.join('\n')}\n\n`;
+      }
+
+      msg += `*VALOR TOTAL LÍQUIDO:* R$ ${total}\n\n`;
+      msg += `WhatsApp: (11) 9 6083-4022 | TEL: (11) 9 4077-4175\n`;
+      msg += `Rua Aristides Bellini 471, Pestana, Osasco, SP`;
+
+      let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    // ABA RECIBOS E BAIXAS
     function atualizarSelectPedidosRecibo() {
       let select = document.getElementById('select-pedido-recibo');
       select.innerHTML = '<option value="">-- Selecione um Pedido --</option>';
@@ -867,28 +989,30 @@
         document.getElementById('recibo-cliente').value = p.cliente;
         document.getElementById('recibo-val-total').value = p.total.toFixed(2);
         document.getElementById('recibo-saldo-devedor').value = p.saldo.toFixed(2);
+
+        // Atualizar Modelo de Recibo para Impressão
+        document.getElementById('recibo-p-cliente').innerText = p.cliente;
+        document.getElementById('recibo-p-num').innerText = p.num;
+        document.getElementById('recibo-p-saldo').innerText = `R$ ${p.saldo.toFixed(2)}`;
+        document.getElementById('recibo-p-data').innerText = new Date().toLocaleDateString('pt-BR');
+
         renderizarHistoricoRecibos(p);
       }
     }
 
     function darBaixaPagamento() {
       let idx = document.getElementById('select-pedido-recibo').value;
-      if (idx === '') { alert('Selecione um pedido!'); return; }
+      if (idx === '') { alert('Selecione um pedido salvo!'); return; }
 
       let valPagto = parseFloat(document.getElementById('recibo-val-pagamento').value) || 0;
       let forma = document.getElementById('recibo-forma-pagamento').value;
 
-      if (valPagto <= 0) { alert('Informe um valor de pagamento válido!'); return; }
-
       let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
       let p = pedidos[idx];
 
-      if (valPagto > p.saldo) {
-        alert('O valor informado é maior que o saldo devedor!');
-        return;
-      }
-
       p.saldo -= valPagto;
+      if (p.saldo < 0) p.saldo = 0;
+
       p.historico.push({
         data: new Date().toLocaleDateString('pt-BR'),
         valor: valPagto,
@@ -898,8 +1022,28 @@
       pedidos[idx] = p;
       localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
 
-      alert('Baixa registrada com sucesso!');
+      // Atualizar dados de impressão
+      document.getElementById('recibo-p-valor').innerText = `R$ ${valPagto.toFixed(2)}`;
+      document.getElementById('recibo-p-saldo').innerText = `R$ ${p.saldo.toFixed(2)}`;
+
+      alert('Baixa de pagamento registrada!');
       carregarDadosPedidoRecibo(idx);
+    }
+
+    // COMPARTILHAR RECIBO NO WHATSAPP
+    function compartilharWhatsAppRecibo() {
+      let cliente = document.getElementById('recibo-cliente').value || 'Cliente';
+      let valPagto = parseFloat(document.getElementById('recibo-val-pagamento').value) || 0;
+      let saldo = document.getElementById('recibo-saldo-devedor').value || '0.00';
+
+      let msg = `*DONZAMB@ - Soluções Técnicas em T.I.*\n`;
+      msg += `*RECIBO DE PAGAMENTO*\n\n`;
+      msg += `Confirmamos o recebimento do pagamento de *R$ ${valPagto.toFixed(2)}* referente ao cliente *${cliente}*.\n`;
+      msg += `*Saldo Restante:* R$ ${saldo}\n\n`;
+      msg += `Agradecemos a preferência!`;
+
+      let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     }
 
     function renderizarHistoricoRecibos(pedido) {
@@ -922,21 +1066,9 @@
       div.innerHTML = html;
     }
 
-    // COMPARTILHAR VIA WHATSAPP
-    function compartilharWhatsApp() {
-      let num = document.getElementById('numero-pedido').value;
-      let cliente = document.getElementById('cli-nome').value;
-      let total = document.getElementById('valor-total-final').value;
-      let texto = `Olá ${cliente}, segue a Ordem de Serviço / Pedido nº ${num} da DONZAMB@ no Valor Total de R$ ${total}.`;
-      let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(texto)}`;
-      window.open(url, '_blank');
-    }
-
     // LIMPAR FORMULÁRIO
     function limparFormulario() {
-      if (confirm('Deseja realmente limpar todos os campos digitados?')) {
-        location.reload();
-      }
+      location.reload();
     }
   </script>
 </body>
