@@ -385,7 +385,6 @@
         border: 1px solid #000;
       }
       
-      /* Quando estiver imprimindo a aba Recibo, esconde a OS */
       body.printing-recibo #ordem-servico {
         display: none !important;
       }
@@ -596,7 +595,7 @@
         <p>Declaro, na condição de proprietário ou representante legal do equipamento, que li, compreendi e concordo integralmente com todas as condições acima descritas, não havendo qualquer ressalva a ser feita no momento da contratação do serviço.</p>
       </div>
 
-      <!-- ÁREA DE ASSINATURA (Aparece apenas na impressão/PDF) -->
+      <!-- ÁREA DE ASSINATURA -->
       <div class="signature-area">
         <div class="signature-grid">
           <div>
@@ -637,11 +636,11 @@
         </div>
         <div class="form-group">
           <label>Cliente:</label>
-          <input type="text" id="recibo-cliente">
+          <input type="text" id="recibo-cliente" readonly>
         </div>
         <div class="form-group">
           <label>Valor Total do Pedido (R$):</label>
-          <input type="text" id="recibo-val-total" readonly>
+          <input type="text" id="recibo-val-total" readonly style="font-weight: bold;">
         </div>
         <div class="form-group">
           <label>Saldo Restante / Em Aberto (R$):</label>
@@ -681,11 +680,11 @@
       <h2 style="text-align:center; color:#000; margin-bottom:15px; text-transform:uppercase;">RECIBO DE PAGAMENTO</h2>
       <p style="font-size:1.1rem; line-height:1.6; color:#000;" id="recibo-texto-declaracao">
         Recebi(emos) de <strong id="recibo-p-cliente">____________________</strong> a quantia de 
-        <strong id="recibo-p-valor">R$ 0,00</strong> referente ao pagamento/baixa da Ordem de Serviço nº 
+        <strong id="recibo-p-valor">R$ 0.00</strong> referente ao pagamento/baixa da Ordem de Serviço nº 
         <strong id="recibo-p-num">______</strong>.
       </p>
       <br>
-      <p style="font-size:1rem; color:#000;"><strong>Saldo Restante do Pedido:</strong> <span id="recibo-p-saldo">R$ 0,00</span></p>
+      <p style="font-size:1rem; color:#000;"><strong>Saldo Restante do Pedido:</strong> <span id="recibo-p-saldo">R$ 0.00</span></p>
       <br>
       <div class="signature-grid" style="margin-top:40px;">
         <div>
@@ -736,15 +735,12 @@
       document.getElementById('data-pedido').value = dataFormatada;
       document.getElementById('data-assinatura').value = dataFormatada;
 
-      // Gerar Número Sequencial Sugerido (Pode ser alterado livremente)
       let numAtual = localStorage.getItem('donzamb_num_pedido') || 1;
       document.getElementById('numero-pedido').value = String(numAtual).padStart(3, '0') + '-' + hoje.getFullYear();
 
-      // Adicionar primeira linha inicial de Peça e Serviço
       adicionarPeca();
       adicionarServico();
       
-      // Carregar Clientes e Pedidos salvos na agenda local
       atualizarSelectClientes();
       atualizarSelectPedidosRecibo();
     };
@@ -873,7 +869,7 @@
       }
     }
 
-    // SALVAR PEDIDO NO HISTÓRICO (SEM DADOS OBRIGATÓRIOS)
+    // SALVAR PEDIDO NO HISTÓRICO
     function salvarPedidoHistorico() {
       let num = document.getElementById('numero-pedido').value || '000';
       let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
@@ -891,7 +887,6 @@
       pedidos.push(pedido);
       localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
 
-      // Incrementar contador se for numérico puro
       let numLimpo = parseInt(num.split('-')[0]);
       if (!isNaN(numLimpo)) {
         localStorage.setItem('donzamb_num_pedido', numLimpo + 1);
@@ -901,7 +896,7 @@
       atualizarSelectPedidosRecibo();
     }
 
-    // GERAR IMPRESSÃO / PDF COM NOME DO CLIENTE NO ARQUIVO
+    // GERAR IMPRESSÃO / PDF
     function imprimirOS() {
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
@@ -931,7 +926,6 @@
       let defeito = document.getElementById('info-defeito').value || '';
       let total = document.getElementById('valor-total-final').value || '0.00';
 
-      // Montando lista de peças
       let pecasTexto = [];
       document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
         let desc = row.querySelector('.peca-desc').value;
@@ -940,7 +934,6 @@
         if(desc) pecasTexto.push(`• ${qtd}x ${desc} (R$ ${val})`);
       });
 
-      // Montando lista de serviços
       let servicosTexto = [];
       document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
         let desc = row.querySelector('.serv-desc').value;
@@ -982,7 +975,12 @@
     }
 
     function carregarDadosPedidoRecibo(idx) {
-      if (idx === '') return;
+      if (idx === '') {
+        document.getElementById('recibo-cliente').value = '';
+        document.getElementById('recibo-val-total').value = '';
+        document.getElementById('recibo-saldo-devedor').value = '';
+        return;
+      }
       let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
       let p = pedidos[idx];
       if (p) {
@@ -990,7 +988,6 @@
         document.getElementById('recibo-val-total').value = p.total.toFixed(2);
         document.getElementById('recibo-saldo-devedor').value = p.saldo.toFixed(2);
 
-        // Atualizar Modelo de Recibo para Impressão
         document.getElementById('recibo-p-cliente').innerText = p.cliente;
         document.getElementById('recibo-p-num').innerText = p.num;
         document.getElementById('recibo-p-saldo').innerText = `R$ ${p.saldo.toFixed(2)}`;
@@ -1022,7 +1019,6 @@
       pedidos[idx] = p;
       localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
 
-      // Atualizar dados de impressão
       document.getElementById('recibo-p-valor').innerText = `R$ ${valPagto.toFixed(2)}`;
       document.getElementById('recibo-p-saldo').innerText = `R$ ${p.saldo.toFixed(2)}`;
 
@@ -1030,7 +1026,7 @@
       carregarDadosPedidoRecibo(idx);
     }
 
-    // COMPARTILHAR RECIBO NO WHATSAPP
+    // COMPARTILHAR RECIBO NO WHATSAPP COM A FORMATAÇÃO SOLICITADA
     function compartilharWhatsAppRecibo() {
       let cliente = document.getElementById('recibo-cliente').value || 'Cliente';
       let valPagto = parseFloat(document.getElementById('recibo-val-pagamento').value) || 0;
