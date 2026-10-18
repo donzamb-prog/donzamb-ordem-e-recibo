@@ -219,7 +219,7 @@
       background-color: var(--accent-orange);
       color: #000;
       border: none;
-      padding: 8px 12px;
+      padding: 10px 14px;
       border-radius: 4px;
       font-weight: bold;
       cursor: pointer;
@@ -230,9 +230,10 @@
       background-color: #cc0000;
       color: #fff;
       border: none;
-      padding: 8px;
+      padding: 8px 12px;
       border-radius: 4px;
       cursor: pointer;
+      font-weight: bold;
     }
 
     /* CONDIÇÕES */
@@ -337,7 +338,7 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-    /* ESTILO DE IMPRESSÃO (PDF / PRINT) */
+    /* ESTILO DE IMPRESSÃO */
     @media print {
       body {
         background-color: white !important;
@@ -398,7 +399,7 @@
     }
   </style>
 </head>
-<body oninput="salvarRascunhoAuto()">
+<body>
 
   <!-- CABEÇALHO -->
   <header>
@@ -415,8 +416,8 @@
 
   <!-- MENU DE ABAS -->
   <div class="tabs-nav">
-    <button class="tab-btn active" onclick="openTab('ordem-servico')">CRIAR NOVO PEDIDO</button>
-    <button class="tab-btn" onclick="openTab('emitir-recibo')">EMITIR RECIBO</button>
+    <button type="button" class="tab-btn active" id="btn-tab-os" onclick="openTab('ordem-servico')">CRIAR NOVO PEDIDO</button>
+    <button type="button" class="tab-btn" id="btn-tab-recibo" onclick="openTab('emitir-recibo')">EMITIR RECIBO</button>
   </div>
 
   <!-- ABA 1: CRIAR NOVO PEDIDO -->
@@ -483,7 +484,7 @@
       <summary>Detalhes do Pedido (Itens e Serviços)</summary>
       <div class="form-group" style="margin-bottom: 12px;">
         <label>Valor Visita Técnica (R$):</label>
-        <input type="text" id="val-visita" value="0.00" oninput="calcularTotais()">
+        <input type="text" id="val-visita" value="0,00" oninput="calcularTotais()">
       </div>
 
       <div class="section-title">Peças / Componentes</div>
@@ -504,9 +505,9 @@
     <details open>
       <summary>Desconto</summary>
       <div class="grid-3">
-        <div class="form-group"><label>Desconto Visita (R$):</label><input type="text" id="desc-visita" value="0.00" oninput="calcularTotais()"></div>
-        <div class="form-group"><label>Desconto Peças (R$):</label><input type="text" id="desc-pecas" value="0.00" oninput="calcularTotais()"></div>
-        <div class="form-group"><label>Desconto Serviços (R$):</label><input type="text" id="desc-servicos" value="0.00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Desconto Visita (R$):</label><input type="text" id="desc-visita" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Desconto Peças (R$):</label><input type="text" id="desc-pecas" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Desconto Serviços (R$):</label><input type="text" id="desc-servicos" value="0,00" oninput="calcularTotais()"></div>
       </div>
       <div class="form-group" style="margin-top: 10px;">
         <label>Total de Descontos Subtraídos (R$):</label>
@@ -518,9 +519,9 @@
     <details>
       <summary>Taxas Adicionais</summary>
       <div class="grid-2">
-        <div class="form-group"><label>Valor Taxa de Entrega (R$):</label><input type="text" class="input-taxa" value="0.00" oninput="calcularTotais()"></div>
-        <div class="form-group"><label>Valor do Frete (R$):</label><input type="text" class="input-taxa" value="0.00" oninput="calcularTotais()"></div>
-        <div class="form-group"><label>Outras Taxas (R$):</label><input type="text" class="input-taxa" value="0.00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Valor Taxa de Entrega (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Valor do Frete (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Outras Taxas (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
       </div>
       <div class="form-group" style="margin-top: 10px;">
         <label>Total de Taxas Adicionadas (R$):</label>
@@ -587,4 +588,4 @@
         <p>Os serviços de instalação e configuração de sistemas operacionais e softwares são realizados exclusivamente de forma legal, respeitando as licenças e termos definidos pelos fabricantes. Quando a licença de software for adquirida ou fornecida pelo cliente, este declara estar ciente de que a empresa não se responsabiliza por eventuais irregularidades relacionadas ao licenciamento do referido software.</p>
         
         <h4>5. Formas de pagamento</h4>
-        <p>O pagamento dos serviços poderá ser realizado à vista, em dinheiro, por transferência bancária ou p
+        <p>O pagamento dos serviços poderá ser realizado à v
