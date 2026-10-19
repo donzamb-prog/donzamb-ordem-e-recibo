@@ -323,11 +323,11 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-    /* ESTILO EXCLUSIVO DE IMPRESSÃO / PDF PROFISSIONAL */
+    /* ESTILO EXCLUSIVO DE IMPRESSÃO SEM CORTE DE TEXTO E SEM CAIXAS */
     @media print {
       @page {
         size: A4;
-        margin: 10mm 12mm 10mm 12mm;
+        margin: 8mm 10mm 8mm 10mm;
       }
 
       body {
@@ -335,26 +335,26 @@
         color: #000000 !important;
         padding: 0 !important;
         margin: 0 !important;
-        font-size: 9.5pt;
-        line-height: 1.3;
+        font-size: 9pt;
+        line-height: 1.25;
       }
 
       header {
         background-color: #ffffff !important;
         border: 1px solid #000000 !important;
         border-radius: 4px;
-        padding: 8px 12px;
-        margin-bottom: 10px;
+        padding: 6px 10px;
+        margin-bottom: 8px;
       }
 
       .header-title {
         color: #000000 !important;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
       }
 
       .header-subtitle, .header-contacts {
         color: #333333 !important;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
       }
 
       .section-box, details {
@@ -362,18 +362,18 @@
         color: #000000 !important;
         border: 1px solid #cccccc !important;
         border-radius: 4px;
-        padding: 8px 10px !important;
-        margin-bottom: 8px !important;
+        padding: 6px 8px !important;
+        margin-bottom: 6px !important;
         page-break-inside: avoid;
       }
 
       summary {
         color: #000000 !important;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         list-style: none !important;
-        border-bottom: 1px solid #ddd !important;
-        padding-bottom: 3px !important;
-        margin-bottom: 6px !important;
+        border-bottom: 1px solid #000 !important;
+        padding-bottom: 2px !important;
+        margin-bottom: 4px !important;
       }
 
       summary::-webkit-details-marker {
@@ -382,9 +382,9 @@
 
       .section-title {
         color: #000000 !important;
-        font-size: 0.9rem;
+        font-size: 0.85rem;
         border-bottom: 1px solid #000000 !important;
-        margin-bottom: 6px !important;
+        margin-bottom: 4px !important;
       }
 
       label {
@@ -393,24 +393,33 @@
         font-weight: bold;
       }
 
-      input, select, textarea {
+      input, select {
         background-color: #ffffff !important;
         color: #000000 !important;
         border: none !important;
         border-bottom: 1px solid #888888 !important;
         border-radius: 0 !important;
-        padding: 2px 4px !important;
+        padding: 1px 2px !important;
         font-size: 0.85rem !important;
         height: auto !important;
-        min-height: auto !important;
-        resize: none !important;
-        overflow: visible !important;
-        white-space: pre-wrap !important;
       }
 
+      /* TEXTAREA EXPANSÍVEL NO PRINT - SEM CORTE DE TEXTO */
       textarea {
-        display: block !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        border-bottom: 1px solid #888888 !important;
+        border-radius: 0 !important;
+        padding: 1px 2px !important;
+        font-size: 0.85rem !important;
         width: 100% !important;
+        display: block !important;
+        height: auto !important;
+        min-height: 18px !important;
+        overflow: visible !important;
+        white-space: pre-wrap !important;
+        word-wrap: break-word !important;
       }
 
       .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper, .btn-delete {
@@ -427,14 +436,14 @@
         background: transparent !important;
         border: none !important;
         padding: 0 !important;
-        font-size: 0.75rem !important;
-        line-height: 1.25 !important;
+        font-size: 0.72rem !important;
+        line-height: 1.2 !important;
       }
 
       .terms-box h4 {
         color: #000000 !important;
-        font-size: 0.8rem;
-        margin-top: 4px;
+        font-size: 0.75rem;
+        margin-top: 3px;
       }
 
       .signature-area {
@@ -445,14 +454,14 @@
         background-color: #ffffff !important;
         border: 1px solid #000000 !important;
         color: #000000 !important;
-        padding: 8px 12px;
-        margin-top: 10px;
+        padding: 6px 10px;
+        margin-top: 8px;
         page-break-inside: avoid;
       }
 
       .footer-info {
         color: #000000 !important;
-        font-size: 0.75rem;
+        font-size: 0.7rem;
       }
 
       .footer-info a {
@@ -776,6 +785,16 @@
       return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    // AJUSTA A ALTURA AUTOMÁTICA DOS TEXTAREAS PARA NÃO CORTAR NADA NO PDF
+    function autoAjustarTextareasParaPrint() {
+      document.querySelectorAll('textarea').forEach(ta => {
+        ta.style.height = 'auto';
+        if (ta.scrollHeight > 0) {
+          ta.style.height = (ta.scrollHeight + 4) + 'px';
+        }
+      });
+    }
+
     function openTab(tabId) {
       document.getElementById('ordem-servico').classList.remove('active');
       document.getElementById('emitir-recibo').classList.remove('active');
@@ -967,6 +986,7 @@
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
       document.body.classList.remove('printing-recibo');
+      autoAjustarTextareasParaPrint();
       window.print();
       setTimeout(() => { document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; }, 1000);
     }
@@ -975,6 +995,7 @@
       let cliente = document.getElementById('recibo-cliente').value.trim() || 'CLIENTE';
       document.title = `RECIBO ${cliente.toUpperCase()}`;
       document.body.classList.add('printing-recibo');
+      autoAjustarTextareasParaPrint();
       window.print();
       setTimeout(() => { 
         document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; 
