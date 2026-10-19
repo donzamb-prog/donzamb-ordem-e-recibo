@@ -323,41 +323,146 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
+    /* ESTILO EXCLUSIVO DE IMPRESSÃO / PDF PROFISSIONAL */
     @media print {
+      @page {
+        size: A4;
+        margin: 10mm 12mm 10mm 12mm;
+      }
+
       body {
-        background-color: white !important;
-        color: black !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
         padding: 0 !important;
+        margin: 0 !important;
+        font-size: 9.5pt;
+        line-height: 1.3;
       }
-      header, .section-box, details, footer, #recibo-print-template {
-        background-color: white !important;
-        color: black !important;
-        border: 1px solid #999 !important;
-        box-shadow: none !important;
+
+      header {
+        background-color: #ffffff !important;
+        border: 1px solid #000000 !important;
+        border-radius: 4px;
+        padding: 8px 12px;
+        margin-bottom: 10px;
       }
+
+      .header-title {
+        color: #000000 !important;
+        font-size: 1.5rem;
+      }
+
+      .header-subtitle, .header-contacts {
+        color: #333333 !important;
+        font-size: 0.8rem;
+      }
+
+      .section-box, details {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+        border-radius: 4px;
+        padding: 8px 10px !important;
+        margin-bottom: 8px !important;
+        page-break-inside: avoid;
+      }
+
+      summary {
+        color: #000000 !important;
+        font-size: 0.9rem;
+        list-style: none !important;
+        border-bottom: 1px solid #ddd !important;
+        padding-bottom: 3px !important;
+        margin-bottom: 6px !important;
+      }
+
+      summary::-webkit-details-marker {
+        display: none !important;
+      }
+
+      .section-title {
+        color: #000000 !important;
+        font-size: 0.9rem;
+        border-bottom: 1px solid #000000 !important;
+        margin-bottom: 6px !important;
+      }
+
+      label {
+        color: #333333 !important;
+        font-size: 0.75rem;
+        font-weight: bold;
+      }
+
+      input, select, textarea {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        border-bottom: 1px solid #888888 !important;
+        border-radius: 0 !important;
+        padding: 2px 4px !important;
+        font-size: 0.85rem !important;
+        height: auto !important;
+        min-height: auto !important;
+        resize: none !important;
+        overflow: visible !important;
+        white-space: pre-wrap !important;
+      }
+
+      textarea {
+        display: block !important;
+        width: 100% !important;
+      }
+
       .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper, .btn-delete {
         display: none !important;
       }
+
       details {
         display: block !important;
       }
-      details summary {
-        color: black !important;
-      }
+
       .terms-box {
         max-height: none !important;
+        overflow: visible !important;
+        background: transparent !important;
         border: none !important;
         padding: 0 !important;
+        font-size: 0.75rem !important;
+        line-height: 1.25 !important;
       }
+
+      .terms-box h4 {
+        color: #000000 !important;
+        font-size: 0.8rem;
+        margin-top: 4px;
+      }
+
       .signature-area {
         display: block !important;
       }
-      input, select, textarea {
-        background-color: white !important;
-        color: black !important;
-        border: none !important;
-        border-bottom: 1px solid #333 !important;
+
+      footer {
+        background-color: #ffffff !important;
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+        padding: 8px 12px;
+        margin-top: 10px;
+        page-break-inside: avoid;
       }
+
+      .footer-info {
+        color: #000000 !important;
+        font-size: 0.75rem;
+      }
+
+      .footer-info a {
+        color: #000000 !important;
+      }
+
+      .qr-code-img {
+        border: 1px solid #000000;
+      }
+
       body.printing-recibo #ordem-servico { display: none !important; }
       body.printing-recibo #emitir-recibo-form { display: none !important; }
       body.printing-recibo #recibo-print-template { display: block !important; }
@@ -657,7 +762,6 @@
   </footer>
 
   <script>
-    // CONVERSOR SEGURO DE MOEDA (SUPORTA PONTO E VÍRGULA SEM MULTIPLICAR ZEROS)
     function parseMoeda(v) {
       if (!v) return 0;
       let s = String(v).replace('R$', '').trim();
@@ -667,7 +771,6 @@
       return parseFloat(s) || 0;
     }
 
-    // FORMATADOR OFICIAL EM PADRÃO BRASILEIRO (pt-BR)
     function formatarMoeda(v) {
       let num = parseFloat(v) || 0;
       return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
