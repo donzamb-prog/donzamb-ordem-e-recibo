@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ff7700">
-  <title id="page-title">DONZAMB@ - Ordem de Serviço e Recibos</title>
+  <title>DONZAMB@ - Ordem de Serviço e Recibos</title>
   <style>
     :root {
       --bg-dark: #1e1e1e;
@@ -28,6 +28,7 @@
       background-color: var(--bg-dark);
       color: var(--text-light);
       padding: 15px;
+      padding-bottom: 120px; /* Garante que os botões finais apareçam no celular */
       max-width: 1000px;
       margin: 0 auto;
     }
@@ -47,7 +48,7 @@
     }
 
     .header-logo {
-      max-width: 80px;
+      max-width: 70px;
       height: auto;
     }
 
@@ -57,14 +58,13 @@
     }
 
     .header-title {
-      font-size: 2rem;
+      font-size: 1.8rem;
       font-weight: bold;
       color: var(--accent-orange);
-      letter-spacing: 1px;
     }
 
     .header-subtitle {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
       color: var(--text-light);
       margin-top: 4px;
       font-weight: 600;
@@ -72,12 +72,12 @@
 
     .header-contacts {
       margin-top: 8px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       color: var(--accent-orange);
       font-weight: bold;
     }
 
-    /* NAVEGAÇÃO / ABAS */
+    /* ABAS */
     .tabs-nav {
       display: flex;
       gap: 10px;
@@ -91,10 +91,9 @@
       color: var(--text-light);
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       font-weight: bold;
       cursor: pointer;
-      transition: 0.3s;
     }
 
     .tab-btn.active {
@@ -111,7 +110,7 @@
       display: block;
     }
 
-    /* CAMPOS E ESTRUTURA */
+    /* ESTRUTURA E CAMPOS */
     .section-box {
       background-color: var(--card-bg);
       border-radius: 6px;
@@ -122,27 +121,25 @@
 
     .section-title {
       color: var(--accent-orange);
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       margin-bottom: 12px;
       border-bottom: 1px solid var(--border-color);
       padding-bottom: 5px;
     }
 
-    /* SUBMENUS RECOLHÍVEIS */
     details {
       background-color: #222222;
       border: 1px solid var(--border-color);
       border-radius: 6px;
-      margin-bottom: 10px;
-      padding: 10px;
+      margin-bottom: 12px;
+      padding: 12px;
     }
 
     summary {
       font-weight: bold;
       color: var(--accent-orange);
       cursor: pointer;
-      outline: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
     }
 
     details[open] summary {
@@ -153,24 +150,24 @@
 
     .grid-2 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
     }
 
     .grid-3 {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      gap: 5px;
+      gap: 4px;
     }
 
     label {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
     }
 
@@ -181,18 +178,13 @@
       border: 1px solid var(--border-color);
       border-radius: 4px;
       color: var(--text-light);
-      font-size: 0.95rem;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--accent-orange);
-      outline: none;
+      font-size: 0.9rem;
     }
 
     .checkbox-group {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
       margin-top: 5px;
     }
 
@@ -200,17 +192,16 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .checkbox-item input[type="checkbox"] {
       width: auto;
     }
 
-    /* TABELAS DINÂMICAS DE PEÇAS E SERVIÇOS */
     .dynamic-row {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 8px;
       align-items: center;
     }
@@ -236,59 +227,55 @@
       font-weight: bold;
     }
 
-    /* CONDIÇÕES */
     .terms-box {
       background-color: #181818;
       border: 1px solid var(--border-color);
       padding: 12px;
       border-radius: 6px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       line-height: 1.4;
-      max-height: 250px;
+      max-height: 200px;
       overflow-y: auto;
       margin-bottom: 12px;
     }
 
     .terms-box h4 {
       color: var(--accent-orange);
-      margin-top: 8px;
-      margin-bottom: 4px;
+      margin-top: 6px;
+      margin-bottom: 2px;
     }
 
-    /* ASSINATURA */
     .signature-area {
       display: none;
-      margin-top: 25px;
+      margin-top: 20px;
     }
 
     .signature-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
       text-align: center;
     }
 
     .signature-line {
       border-top: 1px solid #000;
-      margin-top: 35px;
+      margin-top: 30px;
       padding-top: 5px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: bold;
       color: #000;
     }
 
-    /* RECIBO CONTAINER IMPRESSÃO */
     #recibo-print-template {
       display: none;
     }
 
-    /* RODAPÉ */
     footer {
       background-color: #121212;
       border: 1px solid var(--border-color);
       border-radius: 8px;
       padding: 15px;
-      margin-top: 20px;
+      margin-top: 25px;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -297,7 +284,7 @@
     }
 
     .footer-info {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
     }
 
@@ -307,29 +294,31 @@
     }
 
     .qr-code-img {
-      max-width: 90px;
+      max-width: 80px;
       height: auto;
       background: white;
       padding: 4px;
       border-radius: 4px;
     }
 
+    /* BOTÕES DE AÇÃO VISÍVEIS NO FINAL */
     .action-buttons {
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      margin-top: 15px;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
 
     .btn-action {
       flex: 1;
-      min-width: 140px;
-      padding: 12px;
+      min-width: 130px;
+      padding: 14px;
       border: none;
       border-radius: 6px;
       font-weight: bold;
+      font-size: 0.9rem;
       cursor: pointer;
-      transition: 0.2s;
     }
 
     .btn-save { background-color: #28a745; color: white; }
@@ -338,20 +327,17 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-    /* ESTILO DE IMPRESSÃO */
     @media print {
       body {
         background-color: white !important;
         color: black !important;
         padding: 0 !important;
-        margin: 0 !important;
       }
       header, .section-box, details, footer, #recibo-print-template {
         background-color: white !important;
         color: black !important;
         border: 1px solid #999 !important;
         box-shadow: none !important;
-        page-break-inside: avoid;
       }
       .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper, .btn-delete {
         display: none !important;
@@ -361,14 +347,11 @@
       }
       details summary {
         color: black !important;
-        font-size: 1.05rem;
       }
       .terms-box {
         max-height: none !important;
-        overflow: visible !important;
         border: none !important;
         padding: 0 !important;
-        background: transparent !important;
       }
       .signature-area {
         display: block !important;
@@ -378,24 +361,10 @@
         color: black !important;
         border: none !important;
         border-bottom: 1px solid #333 !important;
-        border-radius: 0 !important;
       }
-      .header-title, .section-title, summary {
-        color: #000 !important;
-      }
-      .qr-code-img {
-        border: 1px solid #000;
-      }
-      
-      body.printing-recibo #ordem-servico {
-        display: none !important;
-      }
-      body.printing-recibo #emitir-recibo-form {
-        display: none !important;
-      }
-      body.printing-recibo #recibo-print-template {
-        display: block !important;
-      }
+      body.printing-recibo #ordem-servico { display: none !important; }
+      body.printing-recibo #emitir-recibo-form { display: none !important; }
+      body.printing-recibo #recibo-print-template { display: block !important; }
     }
   </style>
 </head>
@@ -407,9 +376,7 @@
     <div class="header-info">
       <div class="header-title">DONZAMB@</div>
       <div class="header-subtitle">Soluções Técnicas em T.I. – Legal, Segura e Profissional</div>
-      <div class="header-contacts">
-        WhatsApp: (11) 9 6083-4022 | TEL: (11) 9 4077-4175
-      </div>
+      <div class="header-contacts">WhatsApp: (11) 9 6083-4022 | TEL: (11) 9 4077-4175</div>
     </div>
     <img src="logodireita.png" alt="Logo Direita" class="header-logo" onerror="this.style.display='none'">
   </header>
@@ -423,7 +390,6 @@
   <!-- ABA 1: CRIAR NOVO PEDIDO -->
   <div id="ordem-servico" class="tab-content active">
     
-    <!-- DADOS DO PEDIDO E CLIENTE -->
     <div class="section-box">
       <div class="grid-2">
         <div class="form-group">
@@ -462,8 +428,6 @@
     </div>
 
     <!-- SUBMENUS RECOLHÍVEIS -->
-    
-    <!-- 1. Informações básicas -->
     <details open>
       <summary>Informações básicas</summary>
       <div class="grid-2">
@@ -479,7 +443,6 @@
       </div>
     </details>
 
-    <!-- 2. Detalhes do Pedido -->
     <details open>
       <summary>Detalhes do Pedido (Itens e Serviços)</summary>
       <div class="form-group" style="margin-bottom: 12px;">
@@ -501,7 +464,6 @@
       </div>
     </details>
 
-    <!-- 3. Desconto -->
     <details open>
       <summary>Desconto</summary>
       <div class="grid-3">
@@ -515,8 +477,7 @@
       </div>
     </details>
 
-    <!-- 4. Taxas -->
-    <details>
+    <details open>
       <summary>Taxas Adicionais</summary>
       <div class="grid-2">
         <div class="form-group"><label>Valor Taxa de Entrega (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
@@ -529,7 +490,6 @@
       </div>
     </details>
 
-    <!-- TOTAL FINAL DA ORDEM -->
     <div class="section-box" style="border: 2px solid var(--accent-orange);">
       <div class="form-group">
         <label style="font-size: 1.1rem; color: var(--accent-orange); font-weight: bold;">VALOR TOTAL LIQUIDO DO PEDIDO (R$):</label>
@@ -537,7 +497,6 @@
       </div>
     </div>
 
-    <!-- 5. Opções de Pagamento -->
     <details open>
       <summary>Opções de Pagamento</summary>
       <div class="grid-3">
@@ -547,8 +506,7 @@
       </div>
     </details>
 
-    <!-- 6. Meios de pagamento -->
-    <details>
+    <details open>
       <summary>Meios de Pagamento (Múltipla escolha)</summary>
       <div class="checkbox-group">
         <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Transferência bancária"> Transferência bancária</label>
@@ -560,8 +518,7 @@
       </div>
     </details>
 
-    <!-- 7. Informações adicionais -->
-    <details>
+    <details open>
       <summary>Informações adicionais</summary>
       <div class="grid-2">
         <div class="form-group"><label>Garantia:</label><input type="text" id="add-garantia" value="90 dias conforme termo"></div>
@@ -571,21 +528,63 @@
       </div>
     </details>
 
-    <!-- 8. CONDIÇÕES DE PRESTAÇÃO DE SERVIÇOS -->
     <details open>
       <summary>CONDIÇÕES DE PRESTAÇÃO DE SERVIÇOS</summary>
       <div class="terms-box">
         <h4>1. Diagnóstico e defeito informado</h4>
-        <p>O defeito informado pelo cliente será registrado na ordem de serviço. Contudo, o diagnóstico definitivo somente será confirmado após a abertura e análise técnica do equipamento. Caso sejam identificadas outras falhas ou necessidades técnicas, o orçamento inicial poderá ser ajustado mediante comunicação e aprovação do cliente.</p>
-        
+        <p>O defeito informado pelo cliente será registrado na ordem de serviço. Contudo, o diagnóstico definitivo somente será confirmado após a abertura e análise técnica do equipamento.</p>
         <h4>2. Prazo de execução</h4>
-        <p>O prazo de execução dos serviços varia de acordo com a complexidade do trabalho a ser realizado, podendo ser de até 5 (cinco) dias úteis. Para serviços de formatação simples, o prazo estimado é de até 24 (vinte e quatro) horas, salvo imprevistos técnicos, necessidade de testes adicionais ou aguardo de autorização do cliente.</p>
-        
+        <p>O prazo de execução dos serviços varia de acordo com a complexidade do trabalho, podendo ser de até 5 dias úteis.</p>
         <h4>3. Garantia</h4>
-        <p>É concedida garantia de 90 (noventa) dias sobre as peças substituídas e sobre a mão de obra executada, contados a partir da data de entrega do equipamento ao cliente. Quando as peças forem adquiridas diretamente pelo cliente, a garantia concedida será exclusivamente sobre a mão de obra, não sendo de responsabilidade da empresa a garantia das peças fornecidas por terceiros.</p>
-        
+        <p>É concedida garantia de 90 dias sobre as peças substituídas e sobre a mão de obra executada.</p>
         <h4>4. Licenciamento de software</h4>
-        <p>Os serviços de instalação e configuração de sistemas operacionais e softwares são realizados exclusivamente de forma legal, respeitando as licenças e termos definidos pelos fabricantes. Quando a licença de software for adquirida ou fornecida pelo cliente, este declara estar ciente de que a empresa não se responsabiliza por eventuais irregularidades relacionadas ao licenciamento do referido software.</p>
-        
+        <p>A instalação de sistemas é realizada exclusivamente de forma legal.</p>
         <h4>5. Formas de pagamento</h4>
-        <p>O pagamento dos serviços poderá ser realizado à v
+        <p>Pagamento à vista, dinheiro, Pix ou cartão de crédito.</p>
+        <h4>6. Lacre de garantia</h4>
+        <p>A remoção do lacre implica na perda imediata da garantia.</p>
+        <h4>7. Declaração do cliente</h4>
+        <p>Declaro estar de acordo com todas as condições acima.</p>
+      </div>
+
+      <div class="signature-area">
+        <div class="signature-grid">
+          <div>
+            <label style="color:#000; font-weight:bold;">DATA:</label>
+            <input type="text" id="data-assinatura" style="text-align:center;">
+          </div>
+          <div><div class="signature-line">CLIENTE</div></div>
+          <div><div class="signature-line">ASSINATURA</div></div>
+        </div>
+      </div>
+    </details>
+
+    <!-- BOTÕES DE AÇÃO OS (COMPLETAMENTE VISÍVEIS) -->
+    <div class="action-buttons">
+      <button type="button" class="btn-action btn-save" onclick="salvarPedidoHistorico()">SALVAR PEDIDO</button>
+      <button type="button" class="btn-action btn-print" onclick="imprimirOS()">GERAR PDF / IMPRIMIR</button>
+      <button type="button" class="btn-action btn-share" onclick="compartilharWhatsAppOS()">COMPARTILHAR WHATSAPP</button>
+      <button type="button" class="btn-action btn-clear" onclick="limparFormularioComConfirmacao()">LIMPAR DADOS</button>
+    </div>
+
+  </div>
+
+  <!-- ABA 2: EMITIR RECIBO -->
+  <div id="emitir-recibo" class="tab-content">
+    <div class="section-box" id="emitir-recibo-form">
+      <div class="section-title">Emissão e Baixa de Recibo</div>
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Selecione o Pedido Salvo:</label>
+          <select id="select-pedido-recibo" onchange="carregarDadosPedidoRecibo(this.value)">
+            <option value="">-- Selecione um Pedido --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cliente:</label>
+          <input type="text" id="recibo-cliente" readonly>
+        </div>
+        <div class="form-group">
+          <label>Valor Total Líquido do Pedido (R$):</label>
+          <input type="text" id="recibo-val-tot
