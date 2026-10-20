@@ -163,12 +163,16 @@
       gap: 4px;
     }
 
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
     label {
       font-size: 0.8rem;
       color: var(--text-muted);
     }
 
-    input, select, textarea {
+    input, select {
       width: 100%;
       padding: 10px;
       background-color: #1a1a1a;
@@ -176,6 +180,28 @@
       border-radius: 4px;
       color: var(--text-light);
       font-size: 0.9rem;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 10px;
+      background-color: #1a1a1a;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      min-height: 110px; /* Garante pelo menos 5 linhas visíveis na tela */
+      resize: vertical;
+    }
+
+    .print-text-display {
+      display: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.85rem;
+      padding: 2px 0;
+      border-bottom: 1px solid #888;
+      margin-bottom: 4px;
     }
 
     .checkbox-group {
@@ -323,7 +349,7 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-    /* ESTILO EXCLUSIVO DE IMPRESSÃO SEM CORTE DE TEXTO E SEM CAIXAS */
+    /* REGRAS DE IMPRESSÃO / IMPRESSÃO LIMPA E EXPANSÍVEL */
     @media print {
       @page {
         size: A4;
@@ -404,22 +430,14 @@
         height: auto !important;
       }
 
-      /* TEXTAREA EXPANSÍVEL NO PRINT - SEM CORTE DE TEXTO */
+      /* OCULTA O TEXTAREA NATIVO NA IMPRESSÃO PARA EVITAR CORTE DO NAVEGADOR */
       textarea {
-        background-color: #ffffff !important;
-        color: #000000 !important;
-        border: none !important;
-        border-bottom: 1px solid #888888 !important;
-        border-radius: 0 !important;
-        padding: 1px 2px !important;
-        font-size: 0.85rem !important;
-        width: 100% !important;
+        display: none !important;
+      }
+
+      /* EXIBE O TEXTO COMPLETO FORMATADO NO PRINT */
+      .print-text-display {
         display: block !important;
-        height: auto !important;
-        min-height: 18px !important;
-        overflow: visible !important;
-        white-space: pre-wrap !important;
-        word-wrap: break-word !important;
       }
 
       .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper, .btn-delete {
@@ -546,10 +564,21 @@
         <div class="form-group"><label>Modelo:</label><input type="text" id="info-modelo"></div>
         <div class="form-group"><label>Tipo de Aparelho:</label><input type="text" id="info-aparelho"></div>
         <div class="form-group"><label>Tipo de Equipamento:</label><input type="text" id="info-equipamento"></div>
-        <div class="form-group"><label>Defeito Reclamado:</label><textarea id="info-defeito" rows="2"></textarea></div>
         <div class="form-group"><label>Acessórios Deixados:</label><input type="text" id="info-acessorios"></div>
-        <div class="form-group"><label>Observações:</label><textarea id="info-obs" rows="2"></textarea></div>
         <div class="form-group"><label>Outros:</label><input type="text" id="info-outros"></div>
+
+        <!-- CAMPOS LARGOS COM MAIS LINHAS NATIVAS -->
+        <div class="form-group full-width">
+          <label>Defeito Reclamado:</label>
+          <textarea id="info-defeito" rows="5"></textarea>
+          <div id="print-info-defeito" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Observações:</label>
+          <textarea id="info-obs" rows="5"></textarea>
+          <div id="print-info-obs" class="print-text-display"></div>
+        </div>
       </div>
     </details>
 
@@ -631,10 +660,25 @@
     <details open>
       <summary>Informações adicionais</summary>
       <div class="grid-2">
-        <div class="form-group"><label>Garantia:</label><input type="text" id="add-garantia" value="90 dias conforme termo"></div>
-        <div class="form-group"><label>Anotações:</label><textarea id="add-anotacoes" rows="2"></textarea></div>
-        <div class="form-group"><label>Relatório Técnico:</label><textarea id="add-relatorio" rows="2"></textarea></div>
-        <div class="form-group"><label>Observações Adicionais:</label><textarea id="add-obs" rows="2"></textarea></div>
+        <div class="form-group full-width"><label>Garantia:</label><input type="text" id="add-garantia" value="90 dias conforme termo"></div>
+
+        <div class="form-group full-width">
+          <label>Anotações:</label>
+          <textarea id="add-anotacoes" rows="5"></textarea>
+          <div id="print-add-anotacoes" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Relatório Técnico:</label>
+          <textarea id="add-relatorio" rows="5"></textarea>
+          <div id="print-add-relatorio" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Observações Adicionais:</label>
+          <textarea id="add-obs" rows="5"></textarea>
+          <div id="print-add-obs" class="print-text-display"></div>
+        </div>
       </div>
     </details>
 
@@ -785,12 +829,21 @@
       return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // AJUSTA A ALTURA AUTOMÁTICA DOS TEXTAREAS PARA NÃO CORTAR NADA NO PDF
-    function autoAjustarTextareasParaPrint() {
-      document.querySelectorAll('textarea').forEach(ta => {
-        ta.style.height = 'auto';
-        if (ta.scrollHeight > 0) {
-          ta.style.height = (ta.scrollHeight + 4) + 'px';
+    // PREPARA O TEXTO DOS TEXTAREAS PARA IMPRESSÃO PERFEITA SEM CORTE
+    function prepararTextosParaImpressao() {
+      const ids = [
+        ['info-defeito', 'print-info-defeito'],
+        ['info-obs', 'print-info-obs'],
+        ['add-anotacoes', 'print-add-anotacoes'],
+        ['add-relatorio', 'print-add-relatorio'],
+        ['add-obs', 'print-add-obs']
+      ];
+
+      ids.forEach(([textareaId, printDivId]) => {
+        const txt = document.getElementById(textareaId);
+        const div = document.getElementById(printDivId);
+        if (txt && div) {
+          div.textContent = txt.value.trim() !== '' ? txt.value : '---';
         }
       });
     }
@@ -986,7 +1039,7 @@
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
       document.body.classList.remove('printing-recibo');
-      autoAjustarTextareasParaPrint();
+      prepararTextosParaImpressao();
       window.print();
       setTimeout(() => { document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; }, 1000);
     }
@@ -995,7 +1048,7 @@
       let cliente = document.getElementById('recibo-cliente').value.trim() || 'CLIENTE';
       document.title = `RECIBO ${cliente.toUpperCase()}`;
       document.body.classList.add('printing-recibo');
-      autoAjustarTextareasParaPrint();
+      prepararTextosParaImpressao();
       window.print();
       setTimeout(() => { 
         document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; 
