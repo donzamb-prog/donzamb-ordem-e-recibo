@@ -81,6 +81,18 @@
       font-weight: bold;
     }
 
+    .doc-print-header-title {
+      display: none;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
+    }
+
     .tabs-nav {
       display: flex;
       gap: 10px;
@@ -381,6 +393,10 @@
       .header-title { color: #000000 !important; font-size: 1.4rem; }
       .header-subtitle, .header-contacts { color: #333333 !important; font-size: 0.75rem; }
 
+      .doc-print-header-title {
+        display: block !important;
+      }
+
       .section-box, details {
         background-color: #ffffff !important;
         color: #000000 !important;
@@ -450,7 +466,7 @@
       .footer-info a { color: #000000 !important; }
       .qr-code-img { border: 1px solid #000000; }
 
-      /* TROCA DE TEMPLATES DE IMPRESSÃO VIA JS */
+      /* TROCA DE TEMPLATES DE IMPRESSÃO */
       body.printing-recibo #ordem-servico { display: none !important; }
       body.printing-recibo #emitir-documentos-form { display: none !important; }
       body.printing-recibo #recibo-print-template { display: block !important; }
@@ -482,6 +498,9 @@
 
   <!-- ABA 1: CRIAR NOVO PEDIDO -->
   <div id="ordem-servico" class="tab-content active">
+
+    <!-- TÍTULO DE IMPRESSÃO DA ORDEM DE SERVIÇO -->
+    <div class="doc-print-header-title">ORÇAMENTO / ORDEM DE SERVIÇO</div>
     
     <div class="section-box">
       <div class="grid-2">
