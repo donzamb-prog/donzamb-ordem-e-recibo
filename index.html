@@ -6,9 +6,9 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#ff7700">
-  <title>DONZAMB@ - Ordem de Serviço e Recibos</title>
+  <title>DONZAMB@ - Gestão de Pedidos e Documentos</title>
   
-  <!-- ÍCONES DO ATALHO PARA PC E NAVEGADOR -->
+  <!-- ÍCONES PWA E FAVICON -->
   <link rel="icon" type="image/png" href="logoesquerda.png">
   <link rel="apple-touch-icon" href="logoesquerda.png">
 
@@ -195,7 +195,7 @@
       border-radius: 4px;
       color: var(--text-light);
       font-size: 0.9rem;
-      min-height: 110px; /* Garante pelo menos 5 linhas visíveis na tela */
+      min-height: 110px;
       resize: vertical;
     }
 
@@ -280,21 +280,21 @@
 
     .signature-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 15px;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
       text-align: center;
+      margin-top: 30px;
     }
 
     .signature-line {
       border-top: 1px solid #000;
-      margin-top: 30px;
       padding-top: 5px;
       font-size: 0.8rem;
       font-weight: bold;
       color: #000;
     }
 
-    #recibo-print-template {
+    #recibo-print-template, #nota-servico-print-template {
       display: none;
     }
 
@@ -354,7 +354,7 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-    /* REGRAS DE IMPRESSÃO / IMPRESSÃO LIMPA E EXPANSÍVEL */
+    /* ESTILO EXCLUSIVO DE IMPRESSÃO */
     @media print {
       @page {
         size: A4;
@@ -378,15 +378,8 @@
         margin-bottom: 8px;
       }
 
-      .header-title {
-        color: #000000 !important;
-        font-size: 1.4rem;
-      }
-
-      .header-subtitle, .header-contacts {
-        color: #333333 !important;
-        font-size: 0.75rem;
-      }
+      .header-title { color: #000000 !important; font-size: 1.4rem; }
+      .header-subtitle, .header-contacts { color: #333333 !important; font-size: 0.75rem; }
 
       .section-box, details {
         background-color: #ffffff !important;
@@ -407,22 +400,9 @@
         margin-bottom: 4px !important;
       }
 
-      summary::-webkit-details-marker {
-        display: none !important;
-      }
-
-      .section-title {
-        color: #000000 !important;
-        font-size: 0.85rem;
-        border-bottom: 1px solid #000000 !important;
-        margin-bottom: 4px !important;
-      }
-
-      label {
-        color: #333333 !important;
-        font-size: 0.75rem;
-        font-weight: bold;
-      }
+      summary::-webkit-details-marker { display: none !important; }
+      .section-title { color: #000000 !important; font-size: 0.85rem; border-bottom: 1px solid #000000 !important; margin-bottom: 4px !important; }
+      label { color: #333333 !important; font-size: 0.75rem; font-weight: bold; }
 
       input, select {
         background-color: #ffffff !important;
@@ -435,23 +415,14 @@
         height: auto !important;
       }
 
-      /* OCULTA O TEXTAREA NATIVO NA IMPRESSÃO PARA EVITAR CORTE DO NAVEGADOR */
-      textarea {
-        display: none !important;
-      }
-
-      /* EXIBE O TEXTO COMPLETO FORMATADO NO PRINT */
-      .print-text-display {
-        display: block !important;
-      }
+      textarea { display: none !important; }
+      .print-text-display { display: block !important; }
 
       .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper, .btn-delete {
         display: none !important;
       }
 
-      details {
-        display: block !important;
-      }
+      details { display: block !important; }
 
       .terms-box {
         max-height: none !important;
@@ -463,15 +434,8 @@
         line-height: 1.2 !important;
       }
 
-      .terms-box h4 {
-        color: #000000 !important;
-        font-size: 0.75rem;
-        margin-top: 3px;
-      }
-
-      .signature-area {
-        display: block !important;
-      }
+      .terms-box h4 { color: #000000 !important; font-size: 0.75rem; margin-top: 3px; }
+      .signature-area { display: block !important; }
 
       footer {
         background-color: #ffffff !important;
@@ -482,22 +446,18 @@
         page-break-inside: avoid;
       }
 
-      .footer-info {
-        color: #000000 !important;
-        font-size: 0.7rem;
-      }
+      .footer-info { color: #000000 !important; font-size: 0.7rem; }
+      .footer-info a { color: #000000 !important; }
+      .qr-code-img { border: 1px solid #000000; }
 
-      .footer-info a {
-        color: #000000 !important;
-      }
-
-      .qr-code-img {
-        border: 1px solid #000000;
-      }
-
+      /* TROCA DE TEMPLATES DE IMPRESSÃO VIA JS */
       body.printing-recibo #ordem-servico { display: none !important; }
-      body.printing-recibo #emitir-recibo-form { display: none !important; }
+      body.printing-recibo #emitir-documentos-form { display: none !important; }
       body.printing-recibo #recibo-print-template { display: block !important; }
+
+      body.printing-nota #ordem-servico { display: none !important; }
+      body.printing-nota #emitir-documentos-form { display: none !important; }
+      body.printing-nota #nota-servico-print-template { display: block !important; }
     }
   </style>
 </head>
@@ -517,7 +477,7 @@
   <!-- MENU DE ABAS -->
   <div class="tabs-nav">
     <button type="button" class="tab-btn active" id="btn-tab-os" onclick="openTab('ordem-servico')">CRIAR NOVO PEDIDO</button>
-    <button type="button" class="tab-btn" id="btn-tab-recibo" onclick="openTab('emitir-recibo')">EMITIR RECIBO</button>
+    <button type="button" class="tab-btn" id="btn-tab-docs" onclick="openTab('emitir-documentos')">GERAR DOCUMENTOS E RECIBOS</button>
   </div>
 
   <!-- ABA 1: CRIAR NOVO PEDIDO -->
@@ -560,7 +520,6 @@
       </div>
     </div>
 
-    <!-- SUBMENUS RECOLHÍVEIS -->
     <details open>
       <summary>Informações básicas</summary>
       <div class="grid-2">
@@ -572,7 +531,6 @@
         <div class="form-group"><label>Acessórios Deixados:</label><input type="text" id="info-acessorios"></div>
         <div class="form-group"><label>Outros:</label><input type="text" id="info-outros"></div>
 
-        <!-- CAMPOS LARGOS COM MAIS LINHAS NATIVAS -->
         <div class="form-group full-width">
           <label>Defeito Reclamado:</label>
           <textarea id="info-defeito" rows="5"></textarea>
@@ -713,24 +671,23 @@
             <input type="text" id="data-assinatura" style="text-align:center;">
           </div>
           <div><div class="signature-line">CLIENTE</div></div>
-          <div><div class="signature-line">ASSINATURA</div></div>
         </div>
       </div>
     </details>
 
     <div class="action-buttons">
       <button type="button" class="btn-action btn-save" onclick="salvarPedidoHistorico()">SALVAR PEDIDO</button>
-      <button type="button" class="btn-action btn-print" onclick="imprimirOS()">GERAR PDF / IMPRIMIR</button>
+      <button type="button" class="btn-action btn-print" onclick="imprimirOS()">GERAR ORÇAMENTO / ORDEM DE SERVIÇO</button>
       <button type="button" class="btn-action btn-share" onclick="compartilharWhatsAppOS()">COMPARTILHAR WHATSAPP</button>
       <button type="button" class="btn-action btn-clear" onclick="limparFormularioComConfirmacao()">LIMPAR DADOS</button>
     </div>
 
   </div>
 
-  <!-- ABA 2: EMITIR RECIBO -->
-  <div id="emitir-recibo" class="tab-content">
-    <div class="section-box" id="emitir-recibo-form">
-      <div class="section-title">Emissão e Baixa de Recibo</div>
+  <!-- ABA 2: GERAR DOCUMENTOS E RECIBOS -->
+  <div id="emitir-documentos" class="tab-content">
+    <div class="section-box" id="emitir-documentos-form">
+      <div class="section-title">Gerador de Documentos e Baixa de Recibos</div>
       
       <div class="grid-2">
         <div class="form-group">
@@ -773,14 +730,21 @@
 
       <button type="button" class="btn-add" style="margin-top: 15px; width: 100%; padding: 12px;" onclick="darBaixaPagamento()">Registrar Baixa de Pagamento</button>
 
-      <div class="action-buttons" style="margin-top: 20px;">
-        <button type="button" class="btn-action btn-print" onclick="imprimirRecibo()">GERAR PDF / IMPRIMIR RECIBO</button>
+      <div class="section-title" style="margin-top: 25px;">Gerar e Imprimir Documento Oficial</div>
+
+      <div class="action-buttons">
+        <button type="button" class="btn-action btn-print" onclick="imprimirRecibo()">1. GERAR RECIBO DE PAGAMENTO</button>
+        <button type="button" class="btn-action btn-share" style="background-color: #ff7700; color:#000;" onclick="imprimirNotaServico()">2. GERAR NOTA DE PRESTAÇÃO DE SERVIÇOS</button>
+      </div>
+
+      <div class="action-buttons">
         <button type="button" class="btn-action btn-share" onclick="compartilharWhatsAppRecibo()">COMPARTILHAR RECIBO WHATSAPP</button>
       </div>
 
       <button type="button" class="btn-delete" onclick="excluirPedidoSalvo()">🗑️ EXCLUIR ESTE PEDIDO SALVO</button>
     </div>
 
+    <!-- TEMPLATE 1: IMPRESSÃO DE RECIBO -->
     <div id="recibo-print-template" class="section-box">
       <h2 style="text-align:center; color:#000; margin-bottom:15px;">RECIBO DE PAGAMENTO</h2>
       <p style="font-size:1.1rem; line-height:1.6; color:#000;">
@@ -800,8 +764,25 @@
       </div>
     </div>
 
+    <!-- TEMPLATE 2: NOTA DE PRESTAÇÃO DE SERVIÇOS COM ASSINATURAS DUPAS -->
+    <div id="nota-servico-print-template" class="section-box">
+      <h2 style="text-align:center; color:#000; margin-bottom:12px;">NOTA DE PRESTAÇÃO DE SERVIÇOS</h2>
+      <div id="nota-detalhes-conteudo" style="font-size: 0.85rem; color:#000; line-height: 1.4;">
+        <!-- Preenchido via JavaScript dinamicamente -->
+      </div>
+      
+      <div class="signature-grid">
+        <div>
+          <div class="signature-line">ASSINATURA TÉCNICO (DONZAMB@)</div>
+        </div>
+        <div>
+          <div class="signature-line">ASSINATURA DO CLIENTE</div>
+        </div>
+      </div>
+    </div>
+
     <div class="section-box">
-      <div class="section-title">Histórico de Baixas e Recibos Emitidos</div>
+      <div class="section-title">Histórico de Baixas do Pedido</div>
       <div id="historico-pagamentos">
         <p style="color: var(--text-muted);">Nenhum pedido selecionado.</p>
       </div>
@@ -834,7 +815,6 @@
       return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    // PREPARA O TEXTO DOS TEXTAREAS PARA IMPRESSÃO PERFEITA SEM CORTE
     function prepararTextosParaImpressao() {
       const ids = [
         ['info-defeito', 'print-info-defeito'],
@@ -855,16 +835,16 @@
 
     function openTab(tabId) {
       document.getElementById('ordem-servico').classList.remove('active');
-      document.getElementById('emitir-recibo').classList.remove('active');
+      document.getElementById('emitir-documentos').classList.remove('active');
       document.getElementById('btn-tab-os').classList.remove('active');
-      document.getElementById('btn-tab-recibo').classList.remove('active');
+      document.getElementById('btn-tab-docs').classList.remove('active');
 
       if (tabId === 'ordem-servico') {
         document.getElementById('ordem-servico').classList.add('active');
         document.getElementById('btn-tab-os').classList.add('active');
       } else {
-        document.getElementById('emitir-recibo').classList.add('active');
-        document.getElementById('btn-tab-recibo').classList.add('active');
+        document.getElementById('emitir-documentos').classList.add('active');
+        document.getElementById('btn-tab-docs').classList.add('active');
         atualizarSelectPedidosRecibo();
       }
     }
@@ -1009,6 +989,27 @@
       let totalLiquido = parseMoeda(document.getElementById('valor-total-final').value);
       let sinalEntrada = parseMoeda(document.getElementById('pag-sinal').value);
 
+      let pecas = [];
+      document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
+        pecas.push({
+          desc: row.querySelector('.peca-desc').value,
+          qtd: row.querySelector('.peca-qtd').value,
+          val: row.querySelector('.peca-val').value,
+          tot: row.querySelector('.peca-tot').value
+        });
+      });
+
+      let servicos = [];
+      document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
+        servicos.push({
+          desc: row.querySelector('.serv-desc').value,
+          val: row.querySelector('.serv-val').value
+        });
+      });
+
+      let meios = [];
+      document.querySelectorAll('.meio-pag:checked').forEach(c => meios.push(c.value));
+
       let saldoInicial = totalLiquido - sinalEntrada;
       if (saldoInicial < 0) saldoInicial = 0;
 
@@ -1021,14 +1022,33 @@
         });
       }
 
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      pedidos.push({
+      let objPedido = {
         num: num,
+        data: document.getElementById('data-pedido').value,
         cliente: cliente,
+        tel: document.getElementById('cli-telefone').value,
+        cpf: document.getElementById('cli-cpf').value,
+        end: document.getElementById('cli-endereco').value,
+        marca: document.getElementById('info-marca').value,
+        modelo: document.getElementById('info-modelo').value,
+        aparelho: document.getElementById('info-aparelho').value,
+        defeito: document.getElementById('info-defeito').value,
+        acessorios: document.getElementById('info-acessorios').value,
+        pecas: pecas,
+        servicos: servicos,
         total: totalLiquido,
         saldo: saldoInicial,
+        vista: document.getElementById('pag-vista').value,
+        sinal: document.getElementById('pag-sinal').value,
+        parcelas: document.getElementById('pag-parcelas').value,
+        meios: meios,
+        garantia: document.getElementById('add-garantia').value,
+        relatorio: document.getElementById('add-relatorio').value,
         historico: historicoInicial
-      });
+      };
+
+      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
+      pedidos.push(objPedido);
       localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
 
       let numLimpo = parseInt(num.split('-')[0]);
@@ -1044,20 +1064,66 @@
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
       document.body.classList.remove('printing-recibo');
+      document.body.classList.remove('printing-nota');
       prepararTextosParaImpressao();
       window.print();
-      setTimeout(() => { document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; }, 1000);
+      setTimeout(() => { document.title = "DONZAMB@ - Gestão de Pedidos e Documentos"; }, 1000);
     }
 
     function imprimirRecibo() {
       let cliente = document.getElementById('recibo-cliente').value.trim() || 'CLIENTE';
       document.title = `RECIBO ${cliente.toUpperCase()}`;
+      document.body.classList.remove('printing-nota');
       document.body.classList.add('printing-recibo');
-      prepararTextosParaImpressao();
       window.print();
       setTimeout(() => { 
-        document.title = "DONZAMB@ - Ordem de Serviço e Recibos"; 
+        document.title = "DONZAMB@ - Gestão de Pedidos e Documentos"; 
         document.body.classList.remove('printing-recibo');
+      }, 1000);
+    }
+
+    function imprimirNotaServico() {
+      let idx = document.getElementById('select-pedido-recibo').value;
+      if (idx === '') { alert('Selecione um pedido salvo primeiro!'); return; }
+
+      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
+      let p = pedidos[idx];
+
+      let html = `<p><strong>PEDIDO Nº:</strong> ${p.num} | <strong>DATA:</strong> ${p.data || new Date().toLocaleDateString('pt-BR')}</p>`;
+      html += `<hr style="margin: 6px 0;">`;
+      html += `<p><strong>CLIENTE:</strong> ${p.cliente} | <strong>TEL:</strong> ${p.tel || '---'} | <strong>CPF:</strong> ${p.cpf || '---'}</p>`;
+      html += `<p><strong>ENDEREÇO:</strong> ${p.end || '---'}</p>`;
+      html += `<hr style="margin: 6px 0;">`;
+      html += `<p><strong>EQUIPAMENTO:</strong> ${p.aparelho || ''} ${p.marca || ''} ${p.modelo || ''}</p>`;
+      html += `<p><strong>DEFEITO / OBS:</strong> ${p.defeito || '---'}</p>`;
+      html += `<hr style="margin: 6px 0;">`;
+
+      html += `<p><strong>PEÇAS E COMPONENTES:</strong></p><ul>`;
+      if (p.pecas && p.pecas.length > 0) {
+        p.pecas.forEach(item => { html += `<li>${item.qtd}x ${item.desc} - R$ ${item.tot}</li>`; });
+      } else { html += `<li>Nenhuma peça cadastrada</li>`; }
+      html += `</ul>`;
+
+      html += `<p style="margin-top:6px;"><strong>SERVIÇOS EXECUTADOS:</strong></p><ul>`;
+      if (p.servicos && p.servicos.length > 0) {
+        p.servicos.forEach(s => { html += `<li>${s.desc} - R$ ${s.val}</li>`; });
+      } else { html += `<li>Nenhum serviço cadastrado</li>`; }
+      html += `</ul>`;
+
+      html += `<hr style="margin: 6px 0;">`;
+      html += `<p><strong>VALOR TOTAL LÍQUIDO:</strong> R$ ${formatarMoeda(p.total)}</p>`;
+      html += `<p><strong>PAGAMENTO COMBINADO:</strong> Entrada: R$ ${p.sinal || '0,00'} | Parcelamento: ${p.parcelas || 'À vista'} | Meios: ${p.meios ? p.meios.join(', ') : 'Pix/Dinheiro'}</p>`;
+      html += `<p><strong>GARANTIA:</strong> ${p.garantia || '90 dias conforme termo'}</p>`;
+
+      document.getElementById('nota-detalhes-conteudo').innerHTML = html;
+
+      document.title = `NOTA SERVIÇO ${p.cliente.toUpperCase()}`;
+      document.body.classList.remove('printing-recibo');
+      document.body.classList.add('printing-nota');
+      window.print();
+      setTimeout(() => { 
+        document.title = "DONZAMB@ - Gestão de Pedidos e Documentos"; 
+        document.body.classList.remove('printing-nota');
       }, 1000);
     }
 
