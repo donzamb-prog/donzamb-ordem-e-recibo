@@ -534,7 +534,7 @@
           </div>
         </div>
 
-        <!-- BOTOES DE IMPORTACAO DA AGENDA DO CELULAR E ARQUIVOS -->
+        <!-- BOTEÕES DE IMPORTAÇÃO DA AGENDA DO CELULAR E ARQUIVOS -->
         <div class="grid-2" style="margin-top: 10px;">
           <button type="button" class="btn-action" style="background-color: #17a2b8; color: white;" onclick="importarContatosAgenda()">📱 Importar da Agenda do Celular</button>
           <button type="button" class="btn-action" style="background-color: #6c757d; color: white;" onclick="triggerImportarArquivo()">📂 Importar de Arquivo (JSON/CSV)</button>
@@ -831,7 +831,7 @@
   </footer>
 
   <script>
-    // ENDEREÇO DO GOOGLE APPS SCRIPT PARA GOOGLE SHEETS DEDICADO
+    // COLE A URL DO SEU APPS SCRIPT AQUI ABAIXO:
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVg-R7p89kLyrTIyZfKKbVV268bMiNIvrVvm7aFMMBsQnn_tVZ9IRMBrDv1-_FqGjr/exec";
 
     function parseMoeda(v) {
@@ -977,7 +977,7 @@
       document.getElementById('valor-total-final').value = formatarMoeda(valorFinal);
     }
 
-    // SALVAR CLIENTE LOCALMENTE E SINCRONIZAR COM GOOGLE DRIVE
+    // SALVA LOCALMENTE E ENVIA PARA O GOOGLE SHEETS VIA URL GET (SEM PROBLEMA DE CORS)
     function salvarNovoCliente() {
       let nome = document.getElementById('cli-nome').value || 'Cliente sem nome';
       let objCliente = {
@@ -989,18 +989,30 @@
         end: document.getElementById('cli-endereco').value
       };
 
+      // 1. Salva no navegador local
       let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
       clientes.push(objCliente);
       localStorage.setItem('donzamb_clientes', JSON.stringify(clientes));
 
-      // Sincroniza em background com o Google Sheets no Drive via Apps Script
+      // 2. Envia para o Google Sheets via parâmetros GET (URL Query String)
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
-        fetch(GOOGLE_SCRIPT_URL, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ acao: 'salvarCliente', cliente: objCliente })
-        }).catch(err => console.log('Sincronização offline guardada localmente'));
+        let params = new URLSearchParams({
+          ref: objCliente.ref,
+          nome: objCliente.nome,
+          tel: objCliente.tel,
+          cpf: objCliente.cpf,
+          rg: objCliente.rg,
+          end: objCliente.end
+        }).toString();
+
+        fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        }).then(() => {
+          console.log('Cliente enviado com sucesso para a planilha!');
+        }).catch(err => {
+          console.log('Erro de rede ao enviar para a planilha:', err);
+        });
       }
 
       alert('Cliente cadastrado com sucesso!');
@@ -1046,7 +1058,6 @@
       }
     }
 
-    // IMPORTAR CLIENTES DA AGENDA NATIVA DO CELULAR (CHROME ANDROID)
     async function importarContatosAgenda() {
       if ('contacts' in navigator && 'ContactsManager' in window) {
         try {
@@ -1072,7 +1083,6 @@
       document.getElementById('input-arquivo-cliente').click();
     }
 
-    // IMPORTAR CLIENTES VIA ARQUIVO (JSON / CSV)
     function importarArquivoCliente(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -1088,7 +1098,7 @@
           } else if (file.name.endsWith('.csv')) {
             const linhas = content.split('\n');
             linhas.forEach((linha, i) => {
-              if (i === 0 || !linha.trim()) return; // Pula cabeçalho
+              if (i === 0 || !linha.trim()) return;
               const cols = linha.split(';');
               novosClientes.push({
                 ref: cols[0] ? cols[0].trim() : '',
