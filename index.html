@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -207,7 +207,7 @@
       border-radius: 4px;
       color: var(--text-light);
       font-size: 0.9rem;
-      min-height: 110px;
+      min-height: 80px;
       resize: vertical;
     }
 
@@ -560,8 +560,13 @@
         <div class="form-group"><label>Modelo:</label><input type="text" id="info-modelo"></div>
         <div class="form-group"><label>Tipo de Aparelho:</label><input type="text" id="info-aparelho"></div>
         <div class="form-group"><label>Tipo de Equipamento:</label><input type="text" id="info-equipamento"></div>
-        <div class="form-group"><label>Acessórios Deixados:</label><input type="text" id="info-acessorios"></div>
         <div class="form-group"><label>Outros:</label><input type="text" id="info-outros"></div>
+
+        <div class="form-group full-width">
+          <label>Acessórios Deixados:</label>
+          <textarea id="info-acessorios" rows="3"></textarea>
+          <div id="print-info-acessorios" class="print-text-display"></div>
+        </div>
 
         <div class="form-group full-width">
           <label>Defeito Reclamado:</label>
@@ -850,6 +855,7 @@
 
     function prepararTextosParaImpressao() {
       const ids = [
+        ['info-acessorios', 'print-info-acessorios'],
         ['info-defeito', 'print-info-defeito'],
         ['info-obs', 'print-info-obs'],
         ['add-anotacoes', 'print-add-anotacoes'],
@@ -977,7 +983,6 @@
       document.getElementById('valor-total-final').value = formatarMoeda(valorFinal);
     }
 
-    // SALVA LOCALMENTE E ENVIA PARA O GOOGLE SHEETS VIA URL GET (SEM PROBLEMA DE CORS)
     function salvarNovoCliente() {
       let nome = document.getElementById('cli-nome').value || 'Cliente sem nome';
       let objCliente = {
@@ -989,12 +994,10 @@
         end: document.getElementById('cli-endereco').value
       };
 
-      // 1. Salva no navegador local
       let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
       clientes.push(objCliente);
       localStorage.setItem('donzamb_clientes', JSON.stringify(clientes));
 
-      // 2. Envia para o Google Sheets via parâmetros GET (URL Query String)
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
         let params = new URLSearchParams({
           ref: objCliente.ref,
@@ -1128,121 +1131,118 @@
     }
 
     function salvarPedidoHistorico() {
-  let num = document.getElementById('numero-pedido').value || '000';
-  let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
-  let totalLiquido = parseMoeda(document.getElementById('valor-total-final').value);
-  let sinalEntrada = parseMoeda(document.getElementById('pag-sinal').value);
-  let subtotal = parseMoeda(document.getElementById('subtotal-geral').value);
-  let desconto = parseMoeda(document.getElementById('total-desconto').value);
-  let taxas = parseMoeda(document.getElementById('total-taxas').value);
+      let num = document.getElementById('numero-pedido').value || '000';
+      let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
+      let totalLiquido = parseMoeda(document.getElementById('valor-total-final').value);
+      let sinalEntrada = parseMoeda(document.getElementById('pag-sinal').value);
+      let subtotal = parseMoeda(document.getElementById('subtotal-geral').value);
+      let desconto = parseMoeda(document.getElementById('total-desconto').value);
+      let taxas = parseMoeda(document.getElementById('total-taxas').value);
 
-  // Mapeia Peças
-  let pecasArray = [];
-  document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
-    let desc = row.querySelector('.peca-desc').value;
-    let qtd = row.querySelector('.peca-qtd').value;
-    let tot = row.querySelector('.peca-tot').value;
-    if (desc) pecasArray.push(`${qtd}x ${desc} (R$ ${tot})`);
-  });
+      let pecasArray = [];
+      document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
+        let desc = row.querySelector('.peca-desc').value;
+        let qtd = row.querySelector('.peca-qtd').value;
+        let tot = row.querySelector('.peca-tot').value;
+        if (desc) pecasArray.push(`${qtd}x ${desc} (R$ ${tot})`);
+      });
 
-  // Mapeia Serviços
-  let servicosArray = [];
-  document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
-    let desc = row.querySelector('.serv-desc').value;
-    let val = row.querySelector('.serv-val').value;
-    if (desc) servicosArray.push(`${desc} (R$ ${val})`);
-  });
+      let servicosArray = [];
+      document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
+        let desc = row.querySelector('.serv-desc').value;
+        let val = row.querySelector('.serv-val').value;
+        if (desc) servicosArray.push(`${desc} (R$ ${val})`);
+      });
 
-  // Mapeia Meios de Pagamento
-  let meios = [];
-  document.querySelectorAll('.meio-pag:checked').forEach(c => meios.push(c.value));
+      let meios = [];
+      document.querySelectorAll('.meio-pag:checked').forEach(c => meios.push(c.value));
 
-  let saldoInicial = totalLiquido - sinalEntrada;
-  if (saldoInicial < 0) saldoInicial = 0;
+      let saldoInicial = totalLiquido - sinalEntrada;
+      if (saldoInicial < 0) saldoInicial = 0;
 
-  let historicoInicial = [];
-  if (sinalEntrada > 0) {
-    historicoInicial.push({
-      data: new Date().toLocaleDateString('pt-BR'),
-      valor: sinalEntrada,
-      forma: 'Sinal / Entrada'
-    });
-  }
+      let historicoInicial = [];
+      if (sinalEntrada > 0) {
+        historicoInicial.push({
+          data: new Date().toLocaleDateString('pt-BR'),
+          valor: sinalEntrada,
+          forma: 'Sinal / Entrada'
+        });
+      }
 
-  let objPedido = {
-    num: num,
-    data: document.getElementById('data-pedido').value,
-    cliente: cliente,
-    tel: document.getElementById('cli-telefone').value,
-    cpf: document.getElementById('cli-cpf').value,
-    rg: document.getElementById('cli-rg').value,
-    end: document.getElementById('cli-endereco').value,
-    marca: document.getElementById('info-marca').value,
-    modelo: document.getElementById('info-modelo').value,
-    aparelho: document.getElementById('info-aparelho').value,
-    defeito: document.getElementById('info-defeito').value,
-    acessorios: document.getElementById('info-acessorios').value,
-    pecas: pecasArray,
-    servicos: servicosArray,
-    total: totalLiquido,
-    saldo: saldoInicial,
-    vista: document.getElementById('pag-vista').value,
-    sinal: document.getElementById('pag-sinal').value,
-    parcelas: document.getElementById('pag-parcelas').value,
-    meios: meios,
-    garantia: document.getElementById('add-garantia').value,
-    relatorio: document.getElementById('add-relatorio').value,
-    historico: historicoInicial
-  };
+      let objPedido = {
+        num: num,
+        data: document.getElementById('data-pedido').value,
+        cliente: cliente,
+        tel: document.getElementById('cli-telefone').value,
+        cpf: document.getElementById('cli-cpf').value,
+        rg: document.getElementById('cli-rg').value,
+        end: document.getElementById('cli-endereco').value,
+        marca: document.getElementById('info-marca').value,
+        modelo: document.getElementById('info-modelo').value,
+        aparelho: document.getElementById('info-aparelho').value,
+        acessorios: document.getElementById('info-acessorios').value,
+        defeito: document.getElementById('info-defeito').value,
+        pecas: pecasArray,
+        servicos: servicosArray,
+        total: totalLiquido,
+        saldo: saldoInicial,
+        vista: document.getElementById('pag-vista').value,
+        sinal: document.getElementById('pag-sinal').value,
+        parcelas: document.getElementById('pag-parcelas').value,
+        meios: meios,
+        garantia: document.getElementById('add-garantia').value,
+        relatorio: document.getElementById('add-relatorio').value,
+        historico: historicoInicial
+      };
 
-  // 1. Salva no Armazenamento Local do Navegador
-  let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-  pedidos.push(objPedido);
-  localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
+      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
+      pedidos.push(objPedido);
+      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
 
-  let numLimpo = parseInt(num.split('-')[0]);
-  if (!isNaN(numLimpo)) {
-    localStorage.setItem('donzamb_num_pedido', numLimpo + 1);
-  }
+      let numLimpo = parseInt(num.split('-')[0]);
+      if (!isNaN(numLimpo)) {
+        localStorage.setItem('donzamb_num_pedido', numLimpo + 1);
+      }
 
-  // 2. Envia TODOS OS DADOS DO PEDIDO para a Planilha do Google Sheets
-  if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
-    let params = new URLSearchParams({
-      num: objPedido.num,
-      nome: objPedido.cliente,
-      tel: objPedido.tel,
-      cpf: objPedido.cpf,
-      rg: objPedido.rg,
-      end: objPedido.end,
-      aparelho: objPedido.aparelho,
-      marca: objPedido.marca,
-      modelo: objPedido.modelo,
-      defeito: objPedido.defeito,
-      pecas: pecasArray.join(' | '),
-      servicos: servicosArray.join(' | '),
-      subtotal: formatarMoeda(subtotal),
-      desconto: formatarMoeda(desconto),
-      taxas: formatarMoeda(taxas),
-      total: formatarMoeda(totalLiquido),
-      sinal: formatarMoeda(sinalEntrada),
-      saldo: formatarMoeda(saldoInicial),
-      pagamento: meios.join(', ') + (objPedido.parcelas ? ` (${objPedido.parcelas})` : ''),
-      garantia: objPedido.garantia
-    }).toString();
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+        let params = new URLSearchParams({
+          num: objPedido.num,
+          nome: objPedido.cliente,
+          tel: objPedido.tel,
+          cpf: objPedido.cpf,
+          rg: objPedido.rg,
+          end: objPedido.end,
+          aparelho: objPedido.aparelho,
+          marca: objPedido.marca,
+          modelo: objPedido.modelo,
+          acessorios: objPedido.acessorios,
+          defeito: objPedido.defeito,
+          pecas: pecasArray.join(' | '),
+          servicos: servicosArray.join(' | '),
+          subtotal: formatarMoeda(subtotal),
+          desconto: formatarMoeda(desconto),
+          taxas: formatarMoeda(taxas),
+          total: formatarMoeda(totalLiquido),
+          sinal: formatarMoeda(sinalEntrada),
+          saldo: formatarMoeda(saldoInicial),
+          pagamento: meios.join(', ') + (objPedido.parcelas ? ` (${objPedido.parcelas})` : ''),
+          garantia: objPedido.garantia
+        }).toString();
 
-    fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
-      method: 'GET',
-      mode: 'no-cors'
-    }).then(() => {
-      console.log('Pedido completo salvo na planilha!');
-    }).catch(err => {
-      console.log('Erro ao enviar pedido para a planilha:', err);
-    });
-  }
+        fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        }).then(() => {
+          console.log('Pedido completo salvo na planilha!');
+        }).catch(err => {
+          console.log('Erro ao enviar pedido para a planilha:', err);
+        });
+      }
 
-  alert(`Pedido ${num} salvo localmente e registrado na planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
-  atualizarSelectPedidosRecibo();
-}
+      alert(`Pedido ${num} salvo localmente e registrado na planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
+      atualizarSelectPedidosRecibo();
+    }
+
     function imprimirOS() {
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
@@ -1278,6 +1278,7 @@
       html += `<p><strong>ENDEREÇO:</strong> ${p.end || '---'}</p>`;
       html += `<hr style="margin: 6px 0;">`;
       html += `<p><strong>EQUIPAMENTO:</strong> ${p.aparelho || ''} ${p.marca || ''} ${p.modelo || ''}</p>`;
+      html += `<p><strong>ACESSÓRIOS:</strong> ${p.acessorios || 'Nenhum'}</p>`;
       html += `<p><strong>DEFEITO / OBS:</strong> ${p.defeito || '---'}</p>`;
       html += `<hr style="margin: 6px 0;">`;
 
