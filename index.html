@@ -499,7 +499,6 @@
   <!-- ABA 1: CRIAR NOVO PEDIDO -->
   <div id="ordem-servico" class="tab-content active">
 
-    <!-- TÍTULO DE IMPRESSÃO DA ORDEM DE SERVIÇO -->
     <div class="doc-print-header-title">ORÇAMENTO / ORDEM DE SERVIÇO</div>
     
     <div class="section-box">
@@ -517,15 +516,29 @@
 
     <div class="section-box">
       <div class="section-title">Dados do Cliente</div>
-      <div class="grid-2" id="select-cliente-wrapper" style="margin-bottom: 10px;">
-        <div class="form-group">
-          <label>Selecione um Cliente Salvo:</label>
-          <select id="select-cliente" onchange="carregarCliente(this.value)">
-            <option value="">-- Novo Cliente --</option>
-          </select>
+      
+      <!-- GERENCIAMENTO E IMPORTAÇÃO DE CLIENTES -->
+      <div id="select-cliente-wrapper" style="margin-bottom: 12px;">
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Selecione um Cliente Salvo:</label>
+            <div style="display: flex; gap: 6px;">
+              <select id="select-cliente" onchange="carregarCliente(this.value)">
+                <option value="">-- Novo Cliente / Manual --</option>
+              </select>
+              <button type="button" class="btn-remove" title="Excluir Cliente Selecionado" onclick="excluirClienteSelecionado()">🗑️</button>
+            </div>
+          </div>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="button" id="btn-salvar-cliente" class="btn-add" onclick="salvarNovoCliente()">Salvar na Agenda Local</button>
+          </div>
         </div>
-        <div class="form-group" style="justify-content: flex-end;">
-          <button type="button" id="btn-salvar-cliente" class="btn-add" onclick="salvarNovoCliente()">Salvar Dados na Agenda Local</button>
+
+        <!-- BOTOES DE IMPORTACAO DA AGENDA DO CELULAR E ARQUIVOS -->
+        <div class="grid-2" style="margin-top: 10px;">
+          <button type="button" class="btn-action" style="background-color: #17a2b8; color: white;" onclick="importarContatosAgenda()">📱 Importar da Agenda do Celular</button>
+          <button type="button" class="btn-action" style="background-color: #6c757d; color: white;" onclick="triggerImportarArquivo()">📂 Importar de Arquivo (JSON/CSV)</button>
+          <input type="file" id="input-arquivo-cliente" accept=".json,.csv" style="display: none;" onchange="importarArquivoCliente(event)">
         </div>
       </div>
 
@@ -783,12 +796,10 @@
       </div>
     </div>
 
-    <!-- TEMPLATE 2: NOTA DE PRESTAÇÃO DE SERVIÇOS COM ASSINATURAS DUPAS -->
+    <!-- TEMPLATE 2: NOTA DE PRESTAÇÃO DE SERVIÇOS COM ASSINATURAS DUPLAS -->
     <div id="nota-servico-print-template" class="section-box">
       <h2 style="text-align:center; color:#000; margin-bottom:12px;">NOTA DE PRESTAÇÃO DE SERVIÇOS</h2>
-      <div id="nota-detalhes-conteudo" style="font-size: 0.85rem; color:#000; line-height: 1.4;">
-        <!-- Preenchido via JavaScript dinamicamente -->
-      </div>
+      <div id="nota-detalhes-conteudo" style="font-size: 0.85rem; color:#000; line-height: 1.4;"></div>
       
       <div class="signature-grid">
         <div>
@@ -820,6 +831,9 @@
   </footer>
 
   <script>
+    // ENDEREÇO DO GOOGLE APPS SCRIPT PARA GOOGLE SHEETS DEDICADO
+    const GOOGLE_SCRIPT_URL = "COLE_AQUI_A_URL_DO_SEU_WEB_APP_APPS_SCRIPT";
+
     function parseMoeda(v) {
       if (!v) return 0;
       let s = String(v).replace('R$', '').trim();
@@ -963,18 +977,32 @@
       document.getElementById('valor-total-final').value = formatarMoeda(valorFinal);
     }
 
+    // SALVAR CLIENTE LOCALMENTE E SINCRONIZAR COM GOOGLE DRIVE
     function salvarNovoCliente() {
       let nome = document.getElementById('cli-nome').value || 'Cliente sem nome';
-      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-      clientes.push({
+      let objCliente = {
         ref: document.getElementById('cli-referencia').value,
         nome: nome,
         tel: document.getElementById('cli-telefone').value,
         cpf: document.getElementById('cli-cpf').value,
         rg: document.getElementById('cli-rg').value,
         end: document.getElementById('cli-endereco').value
-      });
+      };
+
+      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
+      clientes.push(objCliente);
       localStorage.setItem('donzamb_clientes', JSON.stringify(clientes));
+
+      // Sincroniza em background com o Google Sheets no Drive via Apps Script
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+        fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ acao: 'salvarCliente', cliente: objCliente })
+        }).catch(err => console.log('Sincronização offline guardada localmente'));
+      }
+
       alert('Cliente cadastrado com sucesso!');
       atualizarSelectClientes();
     }
@@ -1000,6 +1028,93 @@
         document.getElementById('cli-rg').value = c.rg || '';
         document.getElementById('cli-endereco').value = c.end || '';
       }
+    }
+
+    function excluirClienteSelecionado() {
+      let idx = document.getElementById('select-cliente').value;
+      if (idx === '') { alert('Selecione um cliente para excluir!'); return; }
+
+      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
+      let c = clientes[idx];
+
+      if (confirm(`Deseja realmente excluir o cliente ${c.nome}?`)) {
+        clientes.splice(idx, 1);
+        localStorage.setItem('donzamb_clientes', JSON.stringify(clientes));
+        alert('Cliente excluído!');
+        atualizarSelectClientes();
+        carregarCliente('');
+      }
+    }
+
+    // IMPORTAR CLIENTES DA AGENDA NATIVA DO CELULAR (CHROME ANDROID)
+    async function importarContatosAgenda() {
+      if ('contacts' in navigator && 'ContactsManager' in window) {
+        try {
+          const props = ['name', 'tel'];
+          const contacts = await navigator.contacts.select(props, { multiple: false });
+          if (contacts && contacts.length > 0) {
+            const c = contacts[0];
+            const nome = c.name && c.name.length > 0 ? c.name[0] : '';
+            const tel = c.tel && c.tel.length > 0 ? c.tel[0] : '';
+            document.getElementById('cli-nome').value = nome;
+            document.getElementById('cli-telefone').value = tel;
+            alert(`Contato ${nome} importado da agenda!`);
+          }
+        } catch (ex) {
+          alert('Seleção de contatos cancelada.');
+        }
+      } else {
+        alert('A integração nativa da agenda é suportada no Chrome Android via HTTPS. Para uso no PC, use a opção "Importar de Arquivo (JSON/CSV)".');
+      }
+    }
+
+    function triggerImportarArquivo() {
+      document.getElementById('input-arquivo-cliente').click();
+    }
+
+    // IMPORTAR CLIENTES VIA ARQUIVO (JSON / CSV)
+    function importarArquivoCliente(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const content = evt.target.result;
+          let novosClientes = [];
+
+          if (file.name.endsWith('.json')) {
+            novosClientes = JSON.parse(content);
+          } else if (file.name.endsWith('.csv')) {
+            const linhas = content.split('\n');
+            linhas.forEach((linha, i) => {
+              if (i === 0 || !linha.trim()) return; // Pula cabeçalho
+              const cols = linha.split(';');
+              novosClientes.push({
+                ref: cols[0] ? cols[0].trim() : '',
+                nome: cols[1] ? cols[1].trim() : 'Sem Nome',
+                tel: cols[2] ? cols[2].trim() : '',
+                cpf: cols[3] ? cols[3].trim() : '',
+                rg: cols[4] ? cols[4].trim() : '',
+                end: cols[5] ? cols[5].trim() : ''
+              });
+            });
+          }
+
+          if (Array.isArray(novosClientes) && novosClientes.length > 0) {
+            let atuais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
+            atuais = atuais.concat(novosClientes);
+            localStorage.setItem('donzamb_clientes', JSON.stringify(atuais));
+            alert(`${novosClientes.length} cliente(s) importado(s) com sucesso!`);
+            atualizarSelectClientes();
+          } else {
+            alert('Nenhum cliente válido foi encontrado no arquivo.');
+          }
+        } catch (err) {
+          alert('Erro ao processar arquivo. Certifique-se de usar um arquivo JSON ou CSV válido.');
+        }
+      };
+      reader.readAsText(file);
     }
 
     function salvarPedidoHistorico() {
