@@ -545,10 +545,11 @@
       <div class="grid-2">
         <div class="form-group"><label>Referência:</label><input type="text" id="cli-referencia"></div>
         <div class="form-group"><label>Nome Completo:</label><input type="text" id="cli-nome"></div>
+        <div class="form-group"><label>E-mail:</label><input type="email" id="cli-email" placeholder="cliente@exemplo.com"></div>
         <div class="form-group"><label>Telefone / WhatsApp:</label><input type="text" id="cli-telefone"></div>
         <div class="form-group"><label>CPF:</label><input type="text" id="cli-cpf"></div>
         <div class="form-group"><label>RG:</label><input type="text" id="cli-rg"></div>
-        <div class="form-group"><label>Endereço Completo:</label><input type="text" id="cli-endereco"></div>
+        <div class="form-group full-width"><label>Endereço Completo:</label><input type="text" id="cli-endereco"></div>
       </div>
     </div>
 
@@ -988,6 +989,7 @@
       let objCliente = {
         ref: document.getElementById('cli-referencia').value,
         nome: nome,
+        email: document.getElementById('cli-email').value,
         tel: document.getElementById('cli-telefone').value,
         cpf: document.getElementById('cli-cpf').value,
         rg: document.getElementById('cli-rg').value,
@@ -1002,6 +1004,7 @@
         let params = new URLSearchParams({
           ref: objCliente.ref,
           nome: objCliente.nome,
+          email: objCliente.email,
           tel: objCliente.tel,
           cpf: objCliente.cpf,
           rg: objCliente.rg,
@@ -1038,6 +1041,7 @@
       if (c) {
         document.getElementById('cli-referencia').value = c.ref || '';
         document.getElementById('cli-nome').value = c.nome || '';
+        document.getElementById('cli-email').value = c.email || '';
         document.getElementById('cli-telefone').value = c.tel || '';
         document.getElementById('cli-cpf').value = c.cpf || '';
         document.getElementById('cli-rg').value = c.rg || '';
@@ -1064,14 +1068,16 @@
     async function importarContatosAgenda() {
       if ('contacts' in navigator && 'ContactsManager' in window) {
         try {
-          const props = ['name', 'tel'];
+          const props = ['name', 'tel', 'email'];
           const contacts = await navigator.contacts.select(props, { multiple: false });
           if (contacts && contacts.length > 0) {
             const c = contacts[0];
             const nome = c.name && c.name.length > 0 ? c.name[0] : '';
             const tel = c.tel && c.tel.length > 0 ? c.tel[0] : '';
+            const email = c.email && c.email.length > 0 ? c.email[0] : '';
             document.getElementById('cli-nome').value = nome;
             document.getElementById('cli-telefone').value = tel;
+            document.getElementById('cli-email').value = email;
             alert(`Contato ${nome} importado da agenda!`);
           }
         } catch (ex) {
@@ -1106,10 +1112,11 @@
               novosClientes.push({
                 ref: cols[0] ? cols[0].trim() : '',
                 nome: cols[1] ? cols[1].trim() : 'Sem Nome',
-                tel: cols[2] ? cols[2].trim() : '',
-                cpf: cols[3] ? cols[3].trim() : '',
-                rg: cols[4] ? cols[4].trim() : '',
-                end: cols[5] ? cols[5].trim() : ''
+                email: cols[2] ? cols[2].trim() : '',
+                tel: cols[3] ? cols[3].trim() : '',
+                cpf: cols[4] ? cols[4].trim() : '',
+                rg: cols[5] ? cols[5].trim() : '',
+                end: cols[6] ? cols[6].trim() : ''
               });
             });
           }
@@ -1173,6 +1180,7 @@
         num: num,
         data: document.getElementById('data-pedido').value,
         cliente: cliente,
+        email: document.getElementById('cli-email').value,
         tel: document.getElementById('cli-telefone').value,
         cpf: document.getElementById('cli-cpf').value,
         rg: document.getElementById('cli-rg').value,
@@ -1208,6 +1216,7 @@
         let params = new URLSearchParams({
           num: objPedido.num,
           nome: objPedido.cliente,
+          email: objPedido.email,
           tel: objPedido.tel,
           cpf: objPedido.cpf,
           rg: objPedido.rg,
@@ -1274,7 +1283,7 @@
 
       let html = `<p><strong>PEDIDO Nº:</strong> ${p.num} | <strong>DATA:</strong> ${p.data || new Date().toLocaleDateString('pt-BR')}</p>`;
       html += `<hr style="margin: 6px 0;">`;
-      html += `<p><strong>CLIENTE:</strong> ${p.cliente} | <strong>TEL:</strong> ${p.tel || '---'} | <strong>CPF:</strong> ${p.cpf || '---'}</p>`;
+      html += `<p><strong>CLIENTE:</strong> ${p.cliente} | <strong>E-MAIL:</strong> ${p.email || '---'} | <strong>TEL:</strong> ${p.tel || '---'} | <strong>CPF:</strong> ${p.cpf || '---'}</p>`;
       html += `<p><strong>ENDEREÇO:</strong> ${p.end || '---'}</p>`;
       html += `<hr style="margin: 6px 0;">`;
       html += `<p><strong>EQUIPAMENTO:</strong> ${p.aparelho || ''} ${p.marca || ''} ${p.modelo || ''}</p>`;
