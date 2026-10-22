@@ -907,17 +907,38 @@
 
     // SINCRONIZA OS DADOS DA PLANILHA NO PC E NO CELULAR EM TEMPO REAL
     function sincronizarComPlanilha() {
+      let clientesLocais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
+      let pedidosLocais = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
+
+      if (clientesLocais.length > 0) clientesGlobais = clientesLocais;
+      if (pedidosLocais.length > 0) pedidosGlobais = pedidosLocais;
+
+      atualizarSelectClientes();
+      atualizarSelectPedidosRecibo();
+
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
         fetch(`${GOOGLE_SCRIPT_URL}?action=buscarDados`)
           .then(res => res.json())
           .then(data => {
             if (data) {
-              if (data.clientes) {
-                clientesGlobais = data.clientes;
+              if (data.clientes && data.clientes.length > 0) {
+                data.clientes.forEach(cNuvem => {
+                  let existe = clientesGlobais.some(cLoc => cLoc.nome && cLoc.nome.trim().toLowerCase() === cNuvem.nome.trim().toLowerCase());
+                  if (!existe) clientesGlobais.push(cNuvem);
+                });
                 localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
               }
-              if (data.pedidos) {
-                pedidosGlobais = data.pedidos;
+
+              if (data.pedidos && data.pedidos.length > 0) {
+                data.pedidos.forEach(pNuvem => {
+                  let existe = pedidosGlobais.some(pLoc => pLoc.num && pLoc.num.trim() === pNuvem.num.trim());
+                  if (!existe) {
+                    pedidosGlobais.push(pNuvem);
+                  } else {
+                    let idx = pedidosGlobais.findIndex(pLoc => pLoc.num && pLoc.num.trim() === pNuvem.num.trim());
+                    if (idx !== -1) pedidosGlobais[idx] = pNuvem;
+                  }
+                });
                 localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
               }
             }
@@ -925,11 +946,7 @@
             atualizarSelectPedidosRecibo();
           })
           .catch(err => {
-            console.log('Erro ao carregar da planilha, usando backup local:', err);
-            clientesGlobais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-            pedidosGlobais = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-            atualizarSelectClientes();
-            atualizarSelectPedidosRecibo();
+            console.log('Sem conexão no momento. Mantendo dados locais:', err);
           });
       }
     }
@@ -1025,7 +1042,13 @@
         end: document.getElementById('cli-endereco').value
       };
 
-      clientesGlobais.push(objCliente);
+      let existe = clientesGlobais.some(c => c.nome.trim().toLowerCase() === nome.trim().toLowerCase());
+      if (!existe) {
+        clientesGlobais.push(objCliente);
+      } else {
+        let idx = clientesGlobais.findIndex(c => c.nome.trim().toLowerCase() === nome.trim().toLowerCase());
+        clientesGlobais[idx] = objCliente;
+      }
       localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
 
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
@@ -1043,8 +1066,8 @@
           method: 'GET',
           mode: 'no-cors'
         }).then(() => {
-          console.log('Cliente salvo e enviado para a nuvem!');
-          sincronizarComPlanilha();
+          console.log('Cliente enviado para a planilha!');
+          setTimeout(sincronizarComPlanilha, 1000);
         });
       }
 
@@ -1061,90 +1084,88 @@
     }
 
     function carregarCliente(index) {
-  if (index === '') return;
-  let c = clientesGlobais[index];
-  if (!c) return;
+      if (index === '') return;
+      let c = clientesGlobais[index];
+      if (!c) return;
 
-  // 1. Preenche os Dados Cadastrais do Cliente
-  document.getElementById('cli-referencia').value = c.ref || '';
-  document.getElementById('cli-nome').value = c.nome || '';
-  document.getElementById('cli-email').value = c.email || '';
-  document.getElementById('cli-telefone').value = c.tel || '';
-  document.getElementById('cli-cpf').value = c.cpf || '';
-  document.getElementById('cli-rg').value = c.rg || '';
-  document.getElementById('cli-endereco').value = c.end || '';
+      // 1. Preenche os Dados Cadastrais
+      document.getElementById('cli-referencia').value = c.ref || '';
+      document.getElementById('cli-nome').value = c.nome || '';
+      document.getElementById('cli-email').value = c.email || '';
+      document.getElementById('cli-telefone').value = c.tel || '';
+      document.getElementById('cli-cpf').value = c.cpf || '';
+      document.getElementById('cli-rg').value = c.rg || '';
+      document.getElementById('cli-endereco').value = c.end || '';
 
-  // 2. Busca o ÚLTIMO PEDIDO feito para este cliente (se existir)
-  let ultimoPedido = null;
-  for (let i = pedidosGlobais.length - 1; i >= 0; i--) {
-    if (pedidosGlobais[i].cliente && pedidosGlobais[i].cliente.trim().toLowerCase() === c.nome.trim().toLowerCase()) {
-      ultimoPedido = pedidosGlobais[i];
-      break;
-    }
-  }
-
-  // 3. Se encontrar um pedido anterior, carrega todos os dados no formulário para edição
-  if (ultimoPedido) {
-    document.getElementById('info-marca').value = ultimoPedido.marca || '';
-    document.getElementById('info-modelo').value = ultimoPedido.modelo || '';
-    document.getElementById('info-aparelho').value = ultimoPedido.aparelho || '';
-    document.getElementById('info-acessorios').value = ultimoPedido.acessorios || '';
-    document.getElementById('info-defeito').value = ultimoPedido.defeito || '';
-    
-    // Limpa tabelas dinâmicas de peças e serviços antes de recarregar
-    document.getElementById('container-pecas').innerHTML = '';
-    document.getElementById('container-servicos').innerHTML = '';
-    countPeca = 0;
-    countServico = 0;
-
-    // Recarrega Peças
-    if (ultimoPedido.pecas) {
-      let listaPecas = Array.isArray(ultimoPedido.pecas) ? ultimoPedido.pecas : ultimoPedido.pecas.split(' | ');
-      listaPecas.forEach(itemStr => {
-        if (!itemStr.trim()) return;
-        adicionarPeca();
-        let row = document.getElementById(`peca-row-${countPeca}`);
-        if (row) {
-          let match = itemStr.match(/^(?:(\d+)x\s+)?(.*?)(?:\s+\(R\$\s*([\d.,]+)\))?$/);
-          if (match) {
-            row.querySelector('.peca-qtd').value = match[1] || '1';
-            row.querySelector('.peca-desc').value = match[2] || itemStr;
-            row.querySelector('.peca-val').value = match[3] || '0,00';
-          } else {
-            row.querySelector('.peca-desc').value = itemStr;
-          }
+      // 2. Busca o último pedido associado
+      let ultimoPedido = null;
+      for (let i = pedidosGlobais.length - 1; i >= 0; i--) {
+        if (pedidosGlobais[i].cliente && pedidosGlobais[i].cliente.trim().toLowerCase() === c.nome.trim().toLowerCase()) {
+          ultimoPedido = pedidosGlobais[i];
+          break;
         }
-      });
-    }
+      }
 
-    // Recarrega Serviços
-    if (ultimoPedido.servicos) {
-      let listaServicos = Array.isArray(ultimoPedido.servicos) ? ultimoPedido.servicos : ultimoPedido.servicos.split(' | ');
-      listaServicos.forEach(itemStr => {
-        if (!itemStr.trim()) return;
-        adicionarServico();
-        let row = document.getElementById(`servico-row-${countServico}`);
-        if (row) {
-          let match = itemStr.match(/^(.*?)(?:\s+\(R\$\s*([\d.,]+)\))?$/);
-          if (match) {
-            row.querySelector('.serv-desc').value = match[1] || itemStr;
-            row.querySelector('.serv-val').value = match[2] || '0,00';
-          } else {
-            row.querySelector('.serv-desc').value = itemStr;
-          }
+      if (ultimoPedido) {
+        document.getElementById('info-marca').value = ultimoPedido.marca || '';
+        document.getElementById('info-modelo').value = ultimoPedido.modelo || '';
+        document.getElementById('info-aparelho').value = ultimoPedido.aparelho || '';
+        document.getElementById('info-acessorios').value = ultimoPedido.acessorios || '';
+        document.getElementById('info-defeito').value = ultimoPedido.defeito || '';
+        
+        document.getElementById('container-pecas').innerHTML = '';
+        document.getElementById('container-servicos').innerHTML = '';
+        countPeca = 0;
+        countServico = 0;
+
+        // Recarrega Peças
+        if (ultimoPedido.pecas) {
+          let listaPecas = Array.isArray(ultimoPedido.pecas) ? ultimoPedido.pecas : ultimoPedido.pecas.split(' | ');
+          listaPecas.forEach(itemStr => {
+            if (!itemStr.trim()) return;
+            adicionarPeca();
+            let row = document.getElementById(`peca-row-${countPeca}`);
+            if (row) {
+              let qtdMatch = itemStr.match(/^(\d+)x\s+/);
+              let qtd = qtdMatch ? qtdMatch[1] : '1';
+              
+              let valMatch = itemStr.match(/\(R\$\s*([\d.,]+)\)/);
+              let val = valMatch ? valMatch[1] : '0,00';
+
+              let desc = itemStr.replace(/^(\d+)x\s+/, '').replace(/\s+\(R\$\s*[\d.,]+\)/, '').trim();
+
+              row.querySelector('.peca-qtd').value = qtd;
+              row.querySelector('.peca-desc').value = desc;
+              row.querySelector('.peca-val').value = val;
+            }
+          });
         }
-      });
+
+        // Recarrega Serviços
+        if (ultimoPedido.servicos) {
+          let listaServicos = Array.isArray(ultimoPedido.servicos) ? ultimoPedido.servicos : ultimoPedido.servicos.split(' | ');
+          listaServicos.forEach(itemStr => {
+            if (!itemStr.trim()) return;
+            adicionarServico();
+            let row = document.getElementById(`servico-row-${countServico}`);
+            if (row) {
+              let valMatch = itemStr.match(/\(R\$\s*([\d.,]+)\)/);
+              let val = valMatch ? valMatch[1] : '0,00';
+              let desc = itemStr.replace(/\s+\(R\$\s*[\d.,]+\)/, '').trim();
+
+              row.querySelector('.serv-desc').value = desc;
+              row.querySelector('.serv-val').value = val;
+            }
+          });
+        }
+
+        if (ultimoPedido.garantia) document.getElementById('add-garantia').value = ultimoPedido.garantia;
+        if (ultimoPedido.sinal) document.getElementById('pag-sinal').value = formatarMoeda(ultimoPedido.sinal);
+        if (ultimoPedido.parcelas) document.getElementById('pag-parcelas').value = ultimoPedido.parcelas;
+
+        calcularTotais();
+      }
     }
-
-    // Recarrega Informações Financeiras e Garantia
-    if (ultimoPedido.garantia) document.getElementById('add-garantia').value = ultimoPedido.garantia;
-    if (ultimoPedido.sinal) document.getElementById('pag-sinal').value = formatarMoeda(ultimoPedido.sinal);
-    if (ultimoPedido.parcelas) document.getElementById('pag-parcelas').value = ultimoPedido.parcelas;
-
-    // Recalcula os totais com base nos novos valores carregados
-    calcularTotais();
-  }
-}
 
     function excluirClienteSelecionado() {
       let idx = document.getElementById('select-cliente').value;
