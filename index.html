@@ -890,14 +890,19 @@
       }
     }
 
+    function gerarProximoNumeroNovoPedido() {
+      const hoje = new Date();
+      let nAtual = localStorage.getItem('donzamb_num_pedido') || 1;
+      return String(nAtual).padStart(3, '0') + '-' + hoje.getFullYear();
+    }
+
     window.onload = function() {
       const hoje = new Date();
       const dStr = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear();
       document.getElementById('data-pedido').value = dStr;
       document.getElementById('data-assinatura').value = dStr;
 
-      let nAtual = localStorage.getItem('donzamb_num_pedido') || 1;
-      document.getElementById('numero-pedido').value = String(nAtual).padStart(3, '0') + '-' + hoje.getFullYear();
+      document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
 
       adicionarPeca();
       adicionarServico();
@@ -936,7 +941,7 @@
                     pedidosGlobais.push(pNuvem);
                   } else {
                     let idx = pedidosGlobais.findIndex(pLoc => pLoc.num && pLoc.num.trim() === pNuvem.num.trim());
-                    if (idx !== -1) pedidosGlobais[idx] = pNuvem;
+                    if (idx !== -1) pedidosGlobais[idx] = Object.assign({}, pedidosGlobais[idx], pNuvem);
                   }
                 });
                 localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
@@ -1127,6 +1132,7 @@
       countServico = 0;
 
       if (index === '') {
+        document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
         adicionarPeca();
         adicionarServico();
         calcularTotais();
@@ -1156,6 +1162,15 @@
 
       // 4. Se encontrar um pedido anterior, carrega todos os dados
       if (ultimoPedido) {
+        // Atualiza o Número do Pedido
+        if (ultimoPedido.num) {
+          document.getElementById('numero-pedido').value = ultimoPedido.num;
+        }
+
+        if (ultimoPedido.data) {
+          document.getElementById('data-pedido').value = ultimoPedido.data;
+        }
+
         document.getElementById('info-marca').value = ultimoPedido.marca || '';
         document.getElementById('info-modelo').value = ultimoPedido.modelo || '';
         document.getElementById('info-aparelho').value = ultimoPedido.aparelho || '';
@@ -1212,12 +1227,21 @@
         if (ultimoPedido.anotacoes) document.getElementById('add-anotacoes').value = ultimoPedido.anotacoes;
         if (ultimoPedido.obs) document.getElementById('add-obs').value = ultimoPedido.obs;
 
+        // Recarrega meios de pagamento selecionados
+        if (ultimoPedido.meios) {
+          let meiosArr = Array.isArray(ultimoPedido.meios) ? ultimoPedido.meios : ultimoPedido.meios.split(', ');
+          document.querySelectorAll('.meio-pag').forEach(chk => {
+            chk.checked = meiosArr.some(m => m.trim().toLowerCase() === chk.value.trim().toLowerCase());
+          });
+        }
+
         // Linhas padrão caso não haja peças ou serviços gravados
         if (countPeca === 0) adicionarPeca();
         if (countServico === 0) adicionarServico();
 
         calcularTotais();
       } else {
+        document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
         adicionarPeca();
         adicionarServico();
         calcularTotais();
@@ -1378,12 +1402,19 @@
         historico: historicoInicial
       };
 
-      pedidosGlobais.push(objPedido);
+      // Atualiza o pedido se já existir, senão adiciona um novo
+      let idxExistente = pedidosGlobais.findIndex(p => p.num && p.num.trim() === num.trim());
+      if (idxExistente !== -1) {
+        pedidosGlobais[idxExistente] = Object.assign({}, pedidosGlobais[idxExistente], objPedido);
+      } else {
+        pedidosGlobais.push(objPedido);
+      }
       localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
 
       let numLimpo = parseInt(num.split('-')[0]);
       if (!isNaN(numLimpo)) {
-        localStorage.setItem('donzamb_num_pedido', numLimpo + 1);
+        let proximoNum = Math.max(numLimpo + 1, parseInt(localStorage.getItem('donzamb_num_pedido') || '1'));
+        localStorage.setItem('donzamb_num_pedido', proximoNum);
       }
 
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
@@ -1409,7 +1440,10 @@
           sinal: formatarMoeda(sinalEntrada),
           saldo: formatarMoeda(saldoInicial),
           pagamento: meios.join(', ') + (objPedido.parcelas ? ` (${objPedido.parcelas})` : ''),
-          garantia: objPedido.garantia
+          garantia: objPedido.garantia,
+          anotacoes: objPedido.anotacoes,
+          relatorio: objPedido.relatorio,
+          obs: objPedido.obs
         }).toString();
 
         fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
