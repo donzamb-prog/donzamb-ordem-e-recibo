@@ -524,7 +524,7 @@
             <label>Selecione um Cliente Salvo:</label>
             <div style="display: flex; gap: 6px;">
               <select id="select-cliente" onchange="carregarCliente(this.value)">
-                <option value="">-- Novo Cliente / Manual --</option>
+                <option value="">-- Carregando Clientes... --</option>
               </select>
               <button type="button" class="btn-remove" title="Excluir Cliente Selecionado" onclick="excluirClienteSelecionado()">🗑️</button>
             </div>
@@ -731,7 +731,7 @@
         <div class="form-group">
           <label>Selecione o Pedido Salvo:</label>
           <select id="select-pedido-recibo" onchange="carregarDadosPedidoRecibo(this.value)">
-            <option value="">-- Selecione um Pedido --</option>
+            <option value="">-- Carregando Pedidos... --</option>
           </select>
         </div>
         <div class="form-group">
@@ -837,8 +837,10 @@
   </footer>
 
   <script>
-    // COLE A URL DO SEU APPS SCRIPT AQUI ABAIXO:
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpjKpnYfgJ2tDDNpid7xFv2dxWN0oGKz-xAyF943jupSMiQeVejGmaR7zeUAmveMxF/exec";
+
+    let clientesGlobais = [];
+    let pedidosGlobais = [];
 
     function parseMoeda(v) {
       if (!v) return 0;
@@ -885,7 +887,6 @@
       } else {
         document.getElementById('emitir-documentos').classList.add('active');
         document.getElementById('btn-tab-docs').classList.add('active');
-        atualizarSelectPedidosRecibo();
       }
     }
 
@@ -900,10 +901,38 @@
 
       adicionarPeca();
       adicionarServico();
-      atualizarSelectClientes();
-      atualizarSelectPedidosRecibo();
+      sincronizarComPlanilha();
       calcularTotais();
     };
+
+    // SINCRONIZA OS DADOS DA PLANILHA NO PC E NO CELULAR EM TEMPO REAL
+    function sincronizarComPlanilha() {
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+        fetch(`${GOOGLE_SCRIPT_URL}?action=buscarDados`)
+          .then(res => res.json())
+          .then(data => {
+            if (data) {
+              if (data.clientes) {
+                clientesGlobais = data.clientes;
+                localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+              }
+              if (data.pedidos) {
+                pedidosGlobais = data.pedidos;
+                localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
+              }
+            }
+            atualizarSelectClientes();
+            atualizarSelectPedidosRecibo();
+          })
+          .catch(err => {
+            console.log('Erro ao carregar da planilha, usando backup local:', err);
+            clientesGlobais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
+            pedidosGlobais = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
+            atualizarSelectClientes();
+            atualizarSelectPedidosRecibo();
+          });
+      }
+    }
 
     let countPeca = 0;
     function adicionarPeca() {
@@ -996,9 +1025,8 @@
         end: document.getElementById('cli-endereco').value
       };
 
-      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-      clientes.push(objCliente);
-      localStorage.setItem('donzamb_clientes', JSON.stringify(clientes));
+      clientesGlobais.push(objCliente);
+      localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
 
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
         let params = new URLSearchParams({
@@ -1015,9 +1043,8 @@
           method: 'GET',
           mode: 'no-cors'
         }).then(() => {
-          console.log('Cliente enviado com sucesso para a planilha!');
-        }).catch(err => {
-          console.log('Erro de rede ao enviar para a planilha:', err);
+          console.log('Cliente salvo e enviado para a nuvem!');
+          sincronizarComPlanilha();
         });
       }
 
@@ -1028,16 +1055,14 @@
     function atualizarSelectClientes() {
       let select = document.getElementById('select-cliente');
       select.innerHTML = '<option value="">-- Novo Cliente / Manual --</option>';
-      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-      clientes.forEach((c, idx) => {
-        select.innerHTML += `<option value="${idx}">${c.nome} (${c.tel})</option>`;
+      clientesGlobais.forEach((c, idx) => {
+        select.innerHTML += `<option value="${idx}">${c.nome} (${c.tel || 'Sem Tel'})</option>`;
       });
     }
 
     function carregarCliente(index) {
       if (index === '') return;
-      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-      let c = clientes[index];
+      let c = clientesGlobais[index];
       if (c) {
         document.getElementById('cli-referencia').value = c.ref || '';
         document.getElementById('cli-nome').value = c.nome || '';
@@ -1053,13 +1078,12 @@
       let idx = document.getElementById('select-cliente').value;
       if (idx === '') { alert('Selecione um cliente para excluir!'); return; }
 
-      let clientes = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-      let c = clientes[idx];
+      let c = clientesGlobais[idx];
 
       if (confirm(`Deseja realmente excluir o cliente ${c.nome}?`)) {
-        clientes.splice(idx, 1);
-        localStorage.setItem('donzamb_clientes', JSON.stringify(clientes));
-        alert('Cliente excluído!');
+        clientesGlobais.splice(idx, 1);
+        localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+        alert('Cliente excluído localmente!');
         atualizarSelectClientes();
         carregarCliente('');
       }
@@ -1122,9 +1146,8 @@
           }
 
           if (Array.isArray(novosClientes) && novosClientes.length > 0) {
-            let atuais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
-            atuais = atuais.concat(novosClientes);
-            localStorage.setItem('donzamb_clientes', JSON.stringify(atuais));
+            clientesGlobais = clientesGlobais.concat(novosClientes);
+            localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
             alert(`${novosClientes.length} cliente(s) importado(s) com sucesso!`);
             atualizarSelectClientes();
           } else {
@@ -1203,9 +1226,8 @@
         historico: historicoInicial
       };
 
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      pedidos.push(objPedido);
-      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
+      pedidosGlobais.push(objPedido);
+      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
 
       let numLimpo = parseInt(num.split('-')[0]);
       if (!isNaN(numLimpo)) {
@@ -1242,13 +1264,12 @@
           method: 'GET',
           mode: 'no-cors'
         }).then(() => {
-          console.log('Pedido completo salvo na planilha!');
-        }).catch(err => {
-          console.log('Erro ao enviar pedido para a planilha:', err);
+          console.log('Pedido salvo e enviado para a nuvem!');
+          setTimeout(sincronizarComPlanilha, 1500);
         });
       }
 
-      alert(`Pedido ${num} salvo localmente e registrado na planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
+      alert(`Pedido ${num} salvo e sincronizado com a planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
       atualizarSelectPedidosRecibo();
     }
 
@@ -1278,8 +1299,7 @@
       let idx = document.getElementById('select-pedido-recibo').value;
       if (idx === '') { alert('Selecione um pedido salvo primeiro!'); return; }
 
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      let p = pedidos[idx];
+      let p = pedidosGlobais[idx];
 
       let html = `<p><strong>PEDIDO Nº:</strong> ${p.num} | <strong>DATA:</strong> ${p.data || new Date().toLocaleDateString('pt-BR')}</p>`;
       html += `<hr style="margin: 6px 0;">`;
@@ -1293,24 +1313,32 @@
 
       html += `<p><strong>PEÇAS E COMPONENTES:</strong></p><ul>`;
       if (p.pecas && p.pecas.length > 0) {
-        p.pecas.forEach(item => { html += `<li>${item.qtd}x ${item.desc} - R$ ${item.tot}</li>`; });
+        if (Array.isArray(p.pecas)) {
+          p.pecas.forEach(item => { html += `<li>${item.qtd ? item.qtd + 'x ' : ''}${item.desc || item} - R$ ${item.tot || ''}</li>`; });
+        } else {
+          html += `<li>${p.pecas}</li>`;
+        }
       } else { html += `<li>Nenhuma peça cadastrada</li>`; }
       html += `</ul>`;
 
       html += `<p style="margin-top:6px;"><strong>SERVIÇOS EXECUTADOS:</strong></p><ul>`;
       if (p.servicos && p.servicos.length > 0) {
-        p.servicos.forEach(s => { html += `<li>${s.desc} - R$ ${s.val}</li>`; });
+        if (Array.isArray(p.servicos)) {
+          p.servicos.forEach(s => { html += `<li>${s.desc || s} - R$ ${s.val || ''}</li>`; });
+        } else {
+          html += `<li>${p.servicos}</li>`;
+        }
       } else { html += `<li>Nenhum serviço cadastrado</li>`; }
       html += `</ul>`;
 
       html += `<hr style="margin: 6px 0;">`;
       html += `<p><strong>VALOR TOTAL LÍQUIDO:</strong> R$ ${formatarMoeda(p.total)}</p>`;
-      html += `<p><strong>PAGAMENTO COMBINADO:</strong> Entrada: R$ ${p.sinal || '0,00'} | Parcelamento: ${p.parcelas || 'À vista'} | Meios: ${p.meios ? p.meios.join(', ') : 'Pix/Dinheiro'}</p>`;
+      html += `<p><strong>PAGAMENTO COMBINADO:</strong> Entrada: R$ ${p.sinal || '0,00'} | Parcelamento: ${p.parcelas || 'À vista'} | Meios: ${p.meios ? (Array.isArray(p.meios) ? p.meios.join(', ') : p.meios) : 'Pix/Dinheiro'}</p>`;
       html += `<p><strong>GARANTIA:</strong> ${p.garantia || '90 dias conforme termo'}</p>`;
 
       document.getElementById('nota-detalhes-conteudo').innerHTML = html;
 
-      document.title = `NOTA SERVIÇO ${p.cliente.toUpperCase()}`;
+      document.title = `NOTA SERVIÇO ${(p.cliente || 'CLIENTE').toUpperCase()}`;
       document.body.classList.remove('printing-recibo');
       document.body.classList.add('printing-nota');
       window.print();
@@ -1338,8 +1366,7 @@
     function atualizarSelectPedidosRecibo() {
       let select = document.getElementById('select-pedido-recibo');
       select.innerHTML = '<option value="">-- Selecione um Pedido --</option>';
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      pedidos.forEach((p, idx) => {
+      pedidosGlobais.forEach((p, idx) => {
         select.innerHTML += `<option value="${idx}">Pedido: ${p.num} - Cliente: ${p.cliente}</option>`;
       });
     }
@@ -1352,8 +1379,7 @@
         document.getElementById('historico-pagamentos').innerHTML = '<p style="color: var(--text-muted);">Nenhum pedido selecionado.</p>';
         return;
       }
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      let p = pedidos[idx];
+      let p = pedidosGlobais[idx];
       if (p) {
         document.getElementById('recibo-cliente').value = p.cliente;
         document.getElementById('recibo-val-total').value = formatarMoeda(p.total);
@@ -1362,7 +1388,7 @@
         document.getElementById('recibo-p-cliente').innerText = p.cliente;
         document.getElementById('recibo-p-num').innerText = p.num;
         document.getElementById('recibo-p-saldo').innerText = `R$ ${formatarMoeda(p.saldo)}`;
-        document.getElementById('recibo-p-data').innerText = new Date().toLocaleDateString('pt-BR');
+        document.getElementById('recibo-p-data').innerText = p.data || new Date().toLocaleDateString('pt-BR');
 
         renderizarHistoricoRecibos(p);
       }
@@ -1377,20 +1403,20 @@
 
       if (valPagto <= 0) { alert('Informe um valor de pagamento válido!'); return; }
 
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      let p = pedidos[idx];
+      let p = pedidosGlobais[idx];
 
-      p.saldo -= valPagto;
+      p.saldo = parseMoeda(p.saldo) - valPagto;
       if (p.saldo < 0) p.saldo = 0;
 
+      if (!p.historico) p.historico = [];
       p.historico.push({
         data: new Date().toLocaleDateString('pt-BR'),
         valor: valPagto,
         forma: forma
       });
 
-      pedidos[idx] = p;
-      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
+      pedidosGlobais[idx] = p;
+      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
 
       document.getElementById('recibo-p-valor').innerText = `R$ ${formatarMoeda(valPagto)}`;
       document.getElementById('recibo-p-saldo').innerText = `R$ ${formatarMoeda(p.saldo)}`;
@@ -1403,13 +1429,12 @@
       let idx = document.getElementById('select-pedido-recibo').value;
       if (idx === '') { alert('Selecione um pedido!'); return; }
 
-      let pedidos = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
-      let p = pedidos[idx];
+      let p = pedidosGlobais[idx];
 
       if (confirm(`Excluir o pedido nº ${p.num} do cliente ${p.cliente}?`)) {
-        pedidos.splice(idx, 1);
-        localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidos));
-        alert('Pedido excluído!');
+        pedidosGlobais.splice(idx, 1);
+        localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
+        alert('Pedido excluído localmente!');
         atualizarSelectPedidosRecibo();
         carregarDadosPedidoRecibo('');
       }
@@ -1432,7 +1457,7 @@
 
     function renderizarHistoricoRecibos(pedido) {
       let div = document.getElementById('historico-pagamentos');
-      if (!pedido.historico || pedido.historico.length === 0) {
+      if (!pedido || !pedido.historico || pedido.historico.length === 0) {
         div.innerHTML = '<p style="color: var(--text-muted);">Nenhum pagamento registrado.</p>';
         return;
       }
