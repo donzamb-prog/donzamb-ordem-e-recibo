@@ -910,7 +910,6 @@
       calcularTotais();
     };
 
-    // SINCRONIZA OS DADOS DA PLANILHA NO PC E NO CELULAR EM TEMPO REAL
     function sincronizarComPlanilha() {
       let clientesLocais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
       let pedidosLocais = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
@@ -942,6 +941,22 @@
                   } else {
                     let idx = pedidosGlobais.findIndex(pLoc => pLoc.num && pLoc.num.trim() === pNuvem.num.trim());
                     if (idx !== -1) pedidosGlobais[idx] = Object.assign({}, pedidosGlobais[idx], pNuvem);
+                  }
+
+                  // Auto-cadastra no select de clientes se veio do pedido
+                  if (pNuvem.cliente) {
+                    let cExiste = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === pNuvem.cliente.trim().toLowerCase());
+                    if (!cExiste) {
+                      clientesGlobais.push({
+                        nome: pNuvem.cliente,
+                        email: pNuvem.email || '',
+                        tel: pNuvem.tel || '',
+                        cpf: pNuvem.cpf || '',
+                        rg: pNuvem.rg || '',
+                        end: pNuvem.end || ''
+                      });
+                      localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+                    }
                   }
                 });
                 localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
@@ -1071,7 +1086,6 @@
           method: 'GET',
           mode: 'no-cors'
         }).then(() => {
-          console.log('Cliente enviado para a planilha!');
           setTimeout(sincronizarComPlanilha, 1000);
         });
       }
@@ -1089,7 +1103,6 @@
     }
 
     function carregarCliente(index) {
-      // 1. Limpa TODOS os campos do formulário para garantir que dados antigos não fiquem visíveis
       document.getElementById('cli-referencia').value = '';
       document.getElementById('cli-nome').value = '';
       document.getElementById('cli-email').value = '';
@@ -1142,7 +1155,6 @@
       let c = clientesGlobais[index];
       if (!c) return;
 
-      // 2. Preenche os Dados Cadastrais do Cliente Selecionado
       document.getElementById('cli-referencia').value = c.ref || '';
       document.getElementById('cli-nome').value = c.nome || '';
       document.getElementById('cli-email').value = c.email || '';
@@ -1151,7 +1163,6 @@
       document.getElementById('cli-rg').value = c.rg || '';
       document.getElementById('cli-endereco').value = c.end || '';
 
-      // 3. Busca o ÚLTIMO PEDIDO feito para este cliente
       let ultimoPedido = null;
       for (let i = pedidosGlobais.length - 1; i >= 0; i--) {
         if (pedidosGlobais[i].cliente && pedidosGlobais[i].cliente.trim().toLowerCase() === c.nome.trim().toLowerCase()) {
@@ -1160,16 +1171,9 @@
         }
       }
 
-      // 4. Se encontrar um pedido anterior, carrega todos os dados
       if (ultimoPedido) {
-        // Atualiza o Número do Pedido
-        if (ultimoPedido.num) {
-          document.getElementById('numero-pedido').value = ultimoPedido.num;
-        }
-
-        if (ultimoPedido.data) {
-          document.getElementById('data-pedido').value = ultimoPedido.data;
-        }
+        if (ultimoPedido.num) document.getElementById('numero-pedido').value = ultimoPedido.num;
+        if (ultimoPedido.data) document.getElementById('data-pedido').value = ultimoPedido.data;
 
         document.getElementById('info-marca').value = ultimoPedido.marca || '';
         document.getElementById('info-modelo').value = ultimoPedido.modelo || '';
@@ -1177,7 +1181,6 @@
         document.getElementById('info-acessorios').value = ultimoPedido.acessorios || '';
         document.getElementById('info-defeito').value = ultimoPedido.defeito || '';
 
-        // Recarrega Peças
         if (ultimoPedido.pecas) {
           let listaPecas = Array.isArray(ultimoPedido.pecas) ? ultimoPedido.pecas : ultimoPedido.pecas.split(' | ');
           listaPecas.forEach(itemStr => {
@@ -1187,10 +1190,8 @@
             if (row) {
               let qtdMatch = itemStr.match(/^(\d+)x\s+/);
               let qtd = qtdMatch ? qtdMatch[1] : '1';
-
               let valMatch = itemStr.match(/\(R\$\s*([\d.,]+)\)/);
               let val = valMatch ? valMatch[1] : '0,00';
-
               let desc = itemStr.replace(/^(\d+)x\s+/, '').replace(/\s+\(R\$\s*[\d.,]+\)/, '').trim();
 
               row.querySelector('.peca-qtd').value = qtd;
@@ -1200,7 +1201,6 @@
           });
         }
 
-        // Recarrega Serviços
         if (ultimoPedido.servicos) {
           let listaServicos = Array.isArray(ultimoPedido.servicos) ? ultimoPedido.servicos : ultimoPedido.servicos.split(' | ');
           listaServicos.forEach(itemStr => {
@@ -1218,7 +1218,6 @@
           });
         }
 
-        // Recarrega Informações Financeiras, Relatórios e Garantia
         if (ultimoPedido.garantia) document.getElementById('add-garantia').value = ultimoPedido.garantia;
         if (ultimoPedido.sinal) document.getElementById('pag-sinal').value = formatarMoeda(ultimoPedido.sinal);
         if (ultimoPedido.parcelas) document.getElementById('pag-parcelas').value = ultimoPedido.parcelas;
@@ -1227,7 +1226,6 @@
         if (ultimoPedido.anotacoes) document.getElementById('add-anotacoes').value = ultimoPedido.anotacoes;
         if (ultimoPedido.obs) document.getElementById('add-obs').value = ultimoPedido.obs;
 
-        // Recarrega meios de pagamento selecionados
         if (ultimoPedido.meios) {
           let meiosArr = Array.isArray(ultimoPedido.meios) ? ultimoPedido.meios : ultimoPedido.meios.split(', ');
           document.querySelectorAll('.meio-pag').forEach(chk => {
@@ -1235,7 +1233,6 @@
           });
         }
 
-        // Linhas padrão caso não haja peças ou serviços gravados
         if (countPeca === 0) adicionarPeca();
         if (countServico === 0) adicionarServico();
 
@@ -1402,7 +1399,22 @@
         historico: historicoInicial
       };
 
-      // Atualiza o pedido se já existir, senão adiciona um novo
+      // Garante que o cliente é adicionado à lista local de clientes se for novo
+      let cExisteLocal = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === cliente.trim().toLowerCase());
+      if (!cExisteLocal && cliente !== 'CLIENTE NÃO INFORMADO') {
+        clientesGlobais.push({
+          ref: document.getElementById('cli-referencia').value,
+          nome: cliente,
+          email: objPedido.email,
+          tel: objPedido.tel,
+          cpf: objPedido.cpf,
+          rg: objPedido.rg,
+          end: objPedido.end
+        });
+        localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+        atualizarSelectClientes();
+      }
+
       let idxExistente = pedidosGlobais.findIndex(p => p.num && p.num.trim() === num.trim());
       if (idxExistente !== -1) {
         pedidosGlobais[idxExistente] = Object.assign({}, pedidosGlobais[idxExistente], objPedido);
@@ -1450,7 +1462,6 @@
           method: 'GET',
           mode: 'no-cors'
         }).then(() => {
-          console.log('Pedido salvo e enviado para a planilha!');
           setTimeout(sincronizarComPlanilha, 1500);
         });
       }
