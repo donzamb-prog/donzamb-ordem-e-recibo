@@ -1331,9 +1331,11 @@
       reader.readAsText(file);
     }
 
-    function salvarPedidoHistorico() {
+function salvarPedidoHistorico() {
       let num = document.getElementById('numero-pedido').value || '000';
       let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
+      let ref = document.getElementById('cli-referencia').value || '';
+      let infoObs = document.getElementById('info-obs').value || '';
       let totalLiquido = parseMoeda(document.getElementById('valor-total-final').value);
       let sinalEntrada = parseMoeda(document.getElementById('pag-sinal').value);
       let subtotal = parseMoeda(document.getElementById('subtotal-geral').value);
@@ -1373,6 +1375,7 @@
       let objPedido = {
         num: num,
         data: document.getElementById('data-pedido').value,
+        ref: ref,
         cliente: cliente,
         email: document.getElementById('cli-email').value,
         tel: document.getElementById('cli-telefone').value,
@@ -1383,6 +1386,7 @@
         modelo: document.getElementById('info-modelo').value,
         aparelho: document.getElementById('info-aparelho').value,
         acessorios: document.getElementById('info-acessorios').value,
+        infoObs: infoObs,
         defeito: document.getElementById('info-defeito').value,
         pecas: pecasArray,
         servicos: servicosArray,
@@ -1403,7 +1407,7 @@
       let cExisteLocal = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === cliente.trim().toLowerCase());
       if (!cExisteLocal && cliente !== 'CLIENTE NÃO INFORMADO') {
         clientesGlobais.push({
-          ref: document.getElementById('cli-referencia').value,
+          ref: ref,
           nome: cliente,
           email: objPedido.email,
           tel: objPedido.tel,
@@ -1432,6 +1436,8 @@
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
         let params = new URLSearchParams({
           num: objPedido.num,
+          data: objPedido.data,
+          ref: objPedido.ref,
           nome: objPedido.cliente,
           email: objPedido.email,
           tel: objPedido.tel,
@@ -1442,6 +1448,7 @@
           marca: objPedido.marca,
           modelo: objPedido.modelo,
           acessorios: objPedido.acessorios,
+          infoObs: objPedido.infoObs,
           defeito: objPedido.defeito,
           pecas: pecasArray.join(' | '),
           servicos: servicosArray.join(' | '),
@@ -1469,7 +1476,6 @@
       alert(`Pedido ${num} salvo e sincronizado com a planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
       atualizarSelectPedidosRecibo();
     }
-
     function imprimirOS() {
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
