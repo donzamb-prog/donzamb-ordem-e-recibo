@@ -366,7 +366,6 @@
     .btn-clear { background-color: #dc3545; color: white; }
     .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
-    /* ESTILO EXCLUSIVO DE IMPRESSÃO */
     @media print {
       @page {
         size: A4;
@@ -393,9 +392,7 @@
       .header-title { color: #000000 !important; font-size: 1.4rem; }
       .header-subtitle, .header-contacts { color: #333333 !important; font-size: 0.75rem; }
 
-      .doc-print-header-title {
-        display: block !important;
-      }
+      .doc-print-header-title { display: block !important; }
 
       .section-box, details {
         background-color: #ffffff !important;
@@ -466,7 +463,6 @@
       .footer-info a { color: #000000 !important; }
       .qr-code-img { border: 1px solid #000000; }
 
-      /* TROCA DE TEMPLATES DE IMPRESSÃO */
       body.printing-recibo #ordem-servico { display: none !important; }
       body.printing-recibo #emitir-documentos-form { display: none !important; }
       body.printing-recibo #recibo-print-template { display: block !important; }
@@ -534,7 +530,6 @@
           </div>
         </div>
 
-        <!-- BOTÕES DE IMPORTAÇÃO DA AGENDA DO CELULAR E ARQUIVOS -->
         <div class="grid-2" style="margin-top: 10px;">
           <button type="button" class="btn-action" style="background-color: #17a2b8; color: white;" onclick="importarContatosAgenda()">📱 Importar da Agenda do Celular</button>
           <button type="button" class="btn-action" style="background-color: #6c757d; color: white;" onclick="triggerImportarArquivo()">📂 Importar de Arquivo (JSON/CSV)</button>
@@ -802,7 +797,7 @@
       </div>
     </div>
 
-    <!-- TEMPLATE 2: NOTA DE PRESTAÇÃO DE SERVIÇOS COM ASSINATURAS DUPLAS -->
+    <!-- TEMPLATE 2: NOTA DE PRESTAÇÃO DE SERVIÇOS -->
     <div id="nota-servico-print-template" class="section-box">
       <h2 style="text-align:center; color:#000; margin-bottom:12px;">NOTA DE PRESTAÇÃO DE SERVIÇOS</h2>
       <div id="nota-detalhes-conteudo" style="font-size: 0.85rem; color:#000; line-height: 1.4;"></div>
@@ -943,7 +938,6 @@
                     if (idx !== -1) pedidosGlobais[idx] = Object.assign({}, pedidosGlobais[idx], pNuvem);
                   }
 
-                  // Auto-cadastra no select de clientes se veio do pedido
                   if (pNuvem.cliente) {
                     let cExiste = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === pNuvem.cliente.trim().toLowerCase());
                     if (!cExiste) {
@@ -1102,7 +1096,45 @@
         select.innerHTML += `<option value="${idx}">${c.nome} (${c.tel || 'Sem Tel'})</option>`;
       });
     }
-    
+
+    function excluirClienteSelecionado() {
+      let select = document.getElementById('select-cliente');
+      let idx = select.value;
+
+      if (idx === '' || idx === null || idx === undefined) {
+        alert('Selecione um cliente válido para excluir!');
+        return;
+      }
+
+      let c = clientesGlobais[idx];
+      if (!c) {
+        alert('Cliente não encontrado!');
+        return;
+      }
+
+      if (confirm(`Deseja realmente excluir o cliente "${c.nome}"?`)) {
+        let nomeExcluido = c.nome;
+        clientesGlobais.splice(idx, 1);
+        localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+
+        if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+          let params = new URLSearchParams({
+            action: 'excluirCliente',
+            nome: nomeExcluido
+          }).toString();
+
+          fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
+            method: 'GET',
+            mode: 'no-cors'
+          });
+        }
+
+        alert('Cliente excluído com sucesso!');
+        atualizarSelectClientes();
+        carregarCliente('');
+      }
+    }
+
     // Formata qualquer data recebida para o padrão brasileiro DD/MM/AAAA
     function formatarDataBR(dataStr) {
       if (!dataStr) return '';
@@ -1119,7 +1151,6 @@
     }
 
     function carregarCliente(index) {
-      // 1. Limpeza completa dos campos do formulário
       document.getElementById('cli-referencia').value = '';
       document.getElementById('cli-nome').value = '';
       document.getElementById('cli-email').value = '';
@@ -1174,7 +1205,6 @@
       let c = clientesGlobais[index];
       if (!c) return;
 
-      // 2. Preenche os Dados Cadastrais
       document.getElementById('cli-referencia').value = c.ref || '';
       document.getElementById('cli-nome').value = c.nome || '';
       document.getElementById('cli-email').value = c.email || '';
@@ -1183,7 +1213,6 @@
       document.getElementById('cli-rg').value = c.rg || '';
       document.getElementById('cli-endereco').value = c.end || '';
 
-      // 3. Busca o último pedido e recupera TODOS os dados digitados
       let ultimoPedido = null;
       for (let i = pedidosGlobais.length - 1; i >= 0; i--) {
         if (pedidosGlobais[i].cliente && pedidosGlobais[i].cliente.trim().toLowerCase() === c.nome.trim().toLowerCase()) {
@@ -1227,7 +1256,6 @@
         if (ultimoPedido.relatorio) document.getElementById('add-relatorio').value = ultimoPedido.relatorio;
         if (ultimoPedido.obs) document.getElementById('add-obs').value = ultimoPedido.obs;
 
-        // Recarrega Peças
         if (ultimoPedido.pecas) {
           let listaPecas = Array.isArray(ultimoPedido.pecas) ? ultimoPedido.pecas : ultimoPedido.pecas.split(' | ');
           listaPecas.forEach(itemStr => {
@@ -1248,7 +1276,6 @@
           });
         }
 
-        // Recarrega Serviços
         if (ultimoPedido.servicos) {
           let listaServicos = Array.isArray(ultimoPedido.servicos) ? ultimoPedido.servicos : ultimoPedido.servicos.split(' | ');
           listaServicos.forEach(itemStr => {
@@ -1372,7 +1399,6 @@
         historico: historicoInicial
       };
 
-      // Adiciona o cliente à lista local caso não exista
       let cExisteLocal = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === cliente.trim().toLowerCase());
       if (!cExisteLocal && cliente !== 'CLIENTE NÃO INFORMADO') {
         clientesGlobais.push({
