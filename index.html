@@ -948,6 +948,7 @@
                     let cExiste = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === pNuvem.cliente.trim().toLowerCase());
                     if (!cExiste) {
                       clientesGlobais.push({
+                        ref: pNuvem.ref || '',
                         nome: pNuvem.cliente,
                         email: pNuvem.email || '',
                         tel: pNuvem.tel || '',
@@ -1101,8 +1102,24 @@
         select.innerHTML += `<option value="${idx}">${c.nome} (${c.tel || 'Sem Tel'})</option>`;
       });
     }
+    
+    // Formata qualquer data recebida para o padrão brasileiro DD/MM/AAAA
+    function formatarDataBR(dataStr) {
+      if (!dataStr) return '';
+      if (dataStr.includes('T')) {
+        let parteData = dataStr.split('T')[0];
+        let p = parteData.split('-');
+        if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+      }
+      if (dataStr.includes('-')) {
+        let p = dataStr.split('-');
+        if (p.length === 3 && p[0].length === 4) return `${p[2]}/${p[1]}/${p[0]}`;
+      }
+      return dataStr;
+    }
 
     function carregarCliente(index) {
+      // 1. Limpeza completa dos campos do formulário
       document.getElementById('cli-referencia').value = '';
       document.getElementById('cli-nome').value = '';
       document.getElementById('cli-email').value = '';
@@ -1146,6 +1163,8 @@
 
       if (index === '') {
         document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
+        const hoje = new Date();
+        document.getElementById('data-pedido').value = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear();
         adicionarPeca();
         adicionarServico();
         calcularTotais();
@@ -1155,6 +1174,7 @@
       let c = clientesGlobais[index];
       if (!c) return;
 
+      // 2. Preenche os Dados Cadastrais
       document.getElementById('cli-referencia').value = c.ref || '';
       document.getElementById('cli-nome').value = c.nome || '';
       document.getElementById('cli-email').value = c.email || '';
@@ -1163,6 +1183,7 @@
       document.getElementById('cli-rg').value = c.rg || '';
       document.getElementById('cli-endereco').value = c.end || '';
 
+      // 3. Busca o último pedido e recupera TODOS os dados digitados
       let ultimoPedido = null;
       for (let i = pedidosGlobais.length - 1; i >= 0; i--) {
         if (pedidosGlobais[i].cliente && pedidosGlobais[i].cliente.trim().toLowerCase() === c.nome.trim().toLowerCase()) {
@@ -1173,14 +1194,40 @@
 
       if (ultimoPedido) {
         if (ultimoPedido.num) document.getElementById('numero-pedido').value = ultimoPedido.num;
-        if (ultimoPedido.data) document.getElementById('data-pedido').value = ultimoPedido.data;
+        if (ultimoPedido.data) document.getElementById('data-pedido').value = formatarDataBR(ultimoPedido.data);
 
+        document.getElementById('info-validade').value = ultimoPedido.validade || '';
         document.getElementById('info-marca').value = ultimoPedido.marca || '';
         document.getElementById('info-modelo').value = ultimoPedido.modelo || '';
         document.getElementById('info-aparelho').value = ultimoPedido.aparelho || '';
+        document.getElementById('info-equipamento').value = ultimoPedido.equipamento || '';
+        document.getElementById('info-outros').value = ultimoPedido.outros || '';
         document.getElementById('info-acessorios').value = ultimoPedido.acessorios || '';
         document.getElementById('info-defeito').value = ultimoPedido.defeito || '';
+        document.getElementById('info-obs').value = ultimoPedido.infoObs || '';
 
+        if (ultimoPedido.valVisita) document.getElementById('val-visita').value = ultimoPedido.valVisita;
+        if (ultimoPedido.descVisita) document.getElementById('desc-visita').value = ultimoPedido.descVisita;
+        if (ultimoPedido.descPecas) document.getElementById('desc-pecas').value = ultimoPedido.descPecas;
+        if (ultimoPedido.descServicos) document.getElementById('desc-servicos').value = ultimoPedido.descServicos;
+
+        let taxasInputs = document.querySelectorAll('.input-taxa');
+        if (taxasInputs.length >= 3) {
+          taxasInputs[0].value = ultimoPedido.taxaEntrega || '0,00';
+          taxasInputs[1].value = ultimoPedido.valorFrete || '0,00';
+          taxasInputs[2].value = ultimoPedido.outrasTaxas || '0,00';
+        }
+
+        if (ultimoPedido.vista) document.getElementById('pag-vista').value = ultimoPedido.vista;
+        if (ultimoPedido.sinal) document.getElementById('pag-sinal').value = formatarMoeda(ultimoPedido.sinal);
+        if (ultimoPedido.parcelas) document.getElementById('pag-parcelas').value = ultimoPedido.parcelas;
+
+        if (ultimoPedido.garantia) document.getElementById('add-garantia').value = ultimoPedido.garantia;
+        if (ultimoPedido.anotacoes) document.getElementById('add-anotacoes').value = ultimoPedido.anotacoes;
+        if (ultimoPedido.relatorio) document.getElementById('add-relatorio').value = ultimoPedido.relatorio;
+        if (ultimoPedido.obs) document.getElementById('add-obs').value = ultimoPedido.obs;
+
+        // Recarrega Peças
         if (ultimoPedido.pecas) {
           let listaPecas = Array.isArray(ultimoPedido.pecas) ? ultimoPedido.pecas : ultimoPedido.pecas.split(' | ');
           listaPecas.forEach(itemStr => {
@@ -1201,6 +1248,7 @@
           });
         }
 
+        // Recarrega Serviços
         if (ultimoPedido.servicos) {
           let listaServicos = Array.isArray(ultimoPedido.servicos) ? ultimoPedido.servicos : ultimoPedido.servicos.split(' | ');
           listaServicos.forEach(itemStr => {
@@ -1217,14 +1265,6 @@
             }
           });
         }
-
-        if (ultimoPedido.garantia) document.getElementById('add-garantia').value = ultimoPedido.garantia;
-        if (ultimoPedido.sinal) document.getElementById('pag-sinal').value = formatarMoeda(ultimoPedido.sinal);
-        if (ultimoPedido.parcelas) document.getElementById('pag-parcelas').value = ultimoPedido.parcelas;
-
-        if (ultimoPedido.relatorio) document.getElementById('add-relatorio').value = ultimoPedido.relatorio;
-        if (ultimoPedido.anotacoes) document.getElementById('add-anotacoes').value = ultimoPedido.anotacoes;
-        if (ultimoPedido.obs) document.getElementById('add-obs').value = ultimoPedido.obs;
 
         if (ultimoPedido.meios) {
           let meiosArr = Array.isArray(ultimoPedido.meios) ? ultimoPedido.meios : ultimoPedido.meios.split(', ');
@@ -1245,93 +1285,7 @@
       }
     }
 
-    function excluirClienteSelecionado() {
-      let idx = document.getElementById('select-cliente').value;
-      if (idx === '') { alert('Selecione um cliente para excluir!'); return; }
-
-      let c = clientesGlobais[idx];
-
-      if (confirm(`Deseja realmente excluir o cliente ${c.nome}?`)) {
-        clientesGlobais.splice(idx, 1);
-        localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
-        alert('Cliente excluído localmente!');
-        atualizarSelectClientes();
-        carregarCliente('');
-      }
-    }
-
-    async function importarContatosAgenda() {
-      if ('contacts' in navigator && 'ContactsManager' in window) {
-        try {
-          const props = ['name', 'tel', 'email'];
-          const contacts = await navigator.contacts.select(props, { multiple: false });
-          if (contacts && contacts.length > 0) {
-            const c = contacts[0];
-            const nome = c.name && c.name.length > 0 ? c.name[0] : '';
-            const tel = c.tel && c.tel.length > 0 ? c.tel[0] : '';
-            const email = c.email && c.email.length > 0 ? c.email[0] : '';
-            document.getElementById('cli-nome').value = nome;
-            document.getElementById('cli-telefone').value = tel;
-            document.getElementById('cli-email').value = email;
-            alert(`Contato ${nome} importado da agenda!`);
-          }
-        } catch (ex) {
-          alert('Seleção de contatos cancelada.');
-        }
-      } else {
-        alert('A integração nativa da agenda é suportada no Chrome Android via HTTPS. Para uso no PC, use a opção "Importar de Arquivo (JSON/CSV)".');
-      }
-    }
-
-    function triggerImportarArquivo() {
-      document.getElementById('input-arquivo-cliente').click();
-    }
-
-    function importarArquivoCliente(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        try {
-          const content = evt.target.result;
-          let novosClientes = [];
-
-          if (file.name.endsWith('.json')) {
-            novosClientes = JSON.parse(content);
-          } else if (file.name.endsWith('.csv')) {
-            const linhas = content.split('\n');
-            linhas.forEach((linha, i) => {
-              if (i === 0 || !linha.trim()) return;
-              const cols = linha.split(';');
-              novosClientes.push({
-                ref: cols[0] ? cols[0].trim() : '',
-                nome: cols[1] ? cols[1].trim() : 'Sem Nome',
-                email: cols[2] ? cols[2].trim() : '',
-                tel: cols[3] ? cols[3].trim() : '',
-                cpf: cols[4] ? cols[4].trim() : '',
-                rg: cols[5] ? cols[5].trim() : '',
-                end: cols[6] ? cols[6].trim() : ''
-              });
-            });
-          }
-
-          if (Array.isArray(novosClientes) && novosClientes.length > 0) {
-            clientesGlobais = clientesGlobais.concat(novosClientes);
-            localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
-            alert(`${novosClientes.length} cliente(s) importado(s) com sucesso!`);
-            atualizarSelectClientes();
-          } else {
-            alert('Nenhum cliente válido foi encontrado no arquivo.');
-          }
-        } catch (err) {
-          alert('Erro ao processar arquivo. Certifique-se de usar um arquivo JSON ou CSV válido.');
-        }
-      };
-      reader.readAsText(file);
-    }
-
-function salvarPedidoHistorico() {
+    function salvarPedidoHistorico() {
       let num = document.getElementById('numero-pedido').value || '000';
       let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
       let ref = document.getElementById('cli-referencia').value || '';
@@ -1341,6 +1295,8 @@ function salvarPedidoHistorico() {
       let subtotal = parseMoeda(document.getElementById('subtotal-geral').value);
       let desconto = parseMoeda(document.getElementById('total-desconto').value);
       let taxas = parseMoeda(document.getElementById('total-taxas').value);
+
+      let tasasInputs = document.querySelectorAll('.input-taxa');
 
       let pecasArray = [];
       document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
@@ -1382,14 +1338,27 @@ function salvarPedidoHistorico() {
         cpf: document.getElementById('cli-cpf').value,
         rg: document.getElementById('cli-rg').value,
         end: document.getElementById('cli-endereco').value,
+        validade: document.getElementById('info-validade').value,
         marca: document.getElementById('info-marca').value,
         modelo: document.getElementById('info-modelo').value,
         aparelho: document.getElementById('info-aparelho').value,
+        equipamento: document.getElementById('info-equipamento').value,
+        outros: document.getElementById('info-outros').value,
         acessorios: document.getElementById('info-acessorios').value,
         infoObs: infoObs,
         defeito: document.getElementById('info-defeito').value,
         pecas: pecasArray,
         servicos: servicosArray,
+        valVisita: document.getElementById('val-visita').value,
+        descVisita: document.getElementById('desc-visita').value,
+        descPecas: document.getElementById('desc-pecas').value,
+        descServicos: document.getElementById('desc-servicos').value,
+        totalDesconto: document.getElementById('total-desconto').value,
+        taxaEntrega: tasasInputs[0] ? tasasInputs[0].value : '0,00',
+        valorFrete: tasasInputs[1] ? tasasInputs[1].value : '0,00',
+        outrasTaxas: tasasInputs[2] ? tasasInputs[2].value : '0,00',
+        totalTaxas: document.getElementById('total-taxas').value,
+        subtotal: formatarMoeda(subtotal),
         total: totalLiquido,
         saldo: saldoInicial,
         vista: document.getElementById('pag-vista').value,
@@ -1403,7 +1372,7 @@ function salvarPedidoHistorico() {
         historico: historicoInicial
       };
 
-      // Garante que o cliente é adicionado à lista local de clientes se for novo
+      // Adiciona o cliente à lista local caso não exista
       let cExisteLocal = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === cliente.trim().toLowerCase());
       if (!cExisteLocal && cliente !== 'CLIENTE NÃO INFORMADO') {
         clientesGlobais.push({
@@ -1444,20 +1413,31 @@ function salvarPedidoHistorico() {
           cpf: objPedido.cpf,
           rg: objPedido.rg,
           end: objPedido.end,
-          aparelho: objPedido.aparelho,
+          validade: objPedido.validade,
           marca: objPedido.marca,
           modelo: objPedido.modelo,
+          aparelho: objPedido.aparelho,
+          equipamento: objPedido.equipamento,
+          outros: objPedido.outros,
           acessorios: objPedido.acessorios,
           infoObs: objPedido.infoObs,
           defeito: objPedido.defeito,
           pecas: pecasArray.join(' | '),
           servicos: servicosArray.join(' | '),
-          subtotal: formatarMoeda(subtotal),
-          desconto: formatarMoeda(desconto),
-          taxas: formatarMoeda(taxas),
+          valVisita: objPedido.valVisita,
+          descVisita: objPedido.descVisita,
+          descPecas: objPedido.descPecas,
+          descServicos: objPedido.descServicos,
+          totalDesconto: objPedido.totalDesconto,
+          taxaEntrega: objPedido.taxaEntrega,
+          valorFrete: objPedido.valorFrete,
+          outrasTaxas: objPedido.outrasTaxas,
+          totalTaxas: objPedido.totalTaxas,
+          subtotal: objPedido.subtotal,
           total: formatarMoeda(totalLiquido),
+          vista: objPedido.vista,
           sinal: formatarMoeda(sinalEntrada),
-          saldo: formatarMoeda(saldoInicial),
+          parcelas: objPedido.parcelas,
           pagamento: meios.join(', ') + (objPedido.parcelas ? ` (${objPedido.parcelas})` : ''),
           garantia: objPedido.garantia,
           anotacoes: objPedido.anotacoes,
@@ -1476,6 +1456,7 @@ function salvarPedidoHistorico() {
       alert(`Pedido ${num} salvo e sincronizado com a planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
       atualizarSelectPedidosRecibo();
     }
+    
     function imprimirOS() {
       let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
       document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
