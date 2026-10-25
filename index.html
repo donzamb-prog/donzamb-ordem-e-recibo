@@ -4,20 +4,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="robots" content="noindex, nofollow">
-  <title>Grupo Escoteiro Memorial 350 SP - Ficha de Inscrição</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#ff7700">
+  <title>DONZAMB@ - Gestão de Pedidos e Documentos</title>
+  
+  <!-- ÍCONES PWA E FAVICON -->
+  <link rel="icon" type="image/png" href="logoesquerda.png">
+  <link rel="apple-touch-icon" href="logoesquerda.png">
+
   <style>
     :root {
-      --primary-color: #151901;
-      --primary-hover: #151901;
-      --secondary-color: #151901;
-      --bg-color: #f4f6f8;
-      --card-bg: #ffffff;
-      --text-color: #151901;
-      --border-color: #cccccc;
-      --required-border: #f5c227;
-      --required-bg: #fffef2;
-      --accent-teal: #008080;
-      --danger-color: #d9534f;
+      --bg-dark: #1e1e1e;
+      --card-bg: #2a2a2a;
+      --accent-orange: #ff7700;
+      --text-light: #ffffff;
+      --text-muted: #cccccc;
+      --border-color: #444444;
     }
 
     * {
@@ -28,2254 +30,1664 @@
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      background-color: var(--bg-dark);
+      color: var(--text-light);
+      padding: 15px;
+      padding-bottom: 120px;
+      max-width: 1000px;
+      margin: 0 auto;
     }
 
-    /* CABEÇALHO */
-    .header {
-      background-color: var(--primary-color);
-      color: #ffffff;
-      padding: 15px 20px;
+    header {
+      background-color: #121212;
+      border: 2px solid var(--accent-orange);
+      border-radius: 8px;
+      padding: 15px;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
-      gap: 15px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-
-    .header-logo-left, .header-logo-right {
-      flex: 0 0 80px;
       text-align: center;
+      margin-bottom: 20px;
     }
 
-    .logo-img {
-      max-width: 80px;
-      max-height: 80px;
-      object-fit: contain;
+    .header-logo {
+      max-width: 70px;
+      height: auto;
+    }
+
+    .header-info {
+      flex: 1;
+      padding: 0 10px;
     }
 
     .header-title {
-      flex: 1;
-      text-align: center;
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--accent-orange);
     }
 
-    .header-title h2 {
-      font-size: 0.9rem;
+    .header-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-top: 4px;
       font-weight: 600;
-      letter-spacing: 0.5px;
-      margin-bottom: 2px;
     }
 
-    .header-title h1 {
-      font-size: 1.35rem;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .header-contacts {
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--accent-orange);
+      font-weight: bold;
     }
 
-    .header-title p {
-      font-size: 0.78rem;
-      opacity: 0.9;
-      line-height: 1.3;
-    }
-
-    @media (max-width: 650px) {
-      .header {
-        flex-direction: column;
-      }
-      .header-logo-left, .header-logo-right {
-        flex: 0 0 auto;
-      }
-    }
-
-    /* CONTAINER PRINCIPAL */
-    main {
-      flex: 1;
-      max-width: 1150px;
-      width: 100%;
-      margin: 20px auto;
-      padding: 0 15px;
-    }
-
-    /* ABAS E INDICADOR DE ROLAGEM */
-    .tabs-wrapper {
-      position: relative;
-      margin-bottom: 20px;
+    .doc-print-header-title {
+      display: none;
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #000;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      border-bottom: 2px solid #000;
+      padding-bottom: 4px;
     }
 
     .tabs-nav {
       display: flex;
-      gap: 5px;
-      border-bottom: 3px solid var(--primary-color);
-      background: #e9ecef;
-      border-radius: 8px 8px 0 0;
-      overflow-x: auto;
-      scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-
-    .tabs-nav::-webkit-scrollbar {
-      display: none;
-    }
-
-    .tabs-scroll-hint {
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 3px;
-      background: linear-gradient(to right, rgba(21, 25, 1, 0), rgba(21, 25, 1, 0.92) 35%);
-      color: #ffffff;
-      display: none;
-      align-items: center;
-      justify-content: flex-end;
-      padding: 0 10px 0 25px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      border-radius: 0 8px 0 0;
-      cursor: pointer;
-      pointer-events: auto;
-      z-index: 5;
-      letter-spacing: 0.5px;
-    }
-
-    .tabs-scroll-hint.visible {
-      display: flex;
-    }
-
-    .tabs-scroll-hint .arrow-anim {
-      display: inline-block;
-      margin-left: 4px;
-      animation: pulseArrow 1.2s infinite alternate;
-    }
-
-    @keyframes pulseArrow {
-      0% { transform: translateX(0); opacity: 0.7; }
-      100% { transform: translateX(4px); opacity: 1; }
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     .tab-btn {
-      padding: 12px 24px;
-      border: none;
-      background: transparent;
+      flex: 1;
+      padding: 12px;
+      background-color: var(--card-bg);
+      color: var(--text-light);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
       font-size: 0.95rem;
-      font-weight: 600;
-      color: #555;
+      font-weight: bold;
       cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .tab-btn:hover {
-      background: #dee2e6;
-      color: var(--primary-color);
     }
 
     .tab-btn.active {
-      background: var(--primary-color);
-      color: #ffffff;
-      border-radius: 6px 6px 0 0;
-    }
-
-    @media (max-width: 600px) {
-      .tab-btn {
-        flex: 1 1 0;
-        padding: 10px 4px;
-        font-size: 0.78rem;
-        text-align: center;
-        white-space: normal;
-        line-height: 1.2;
-      }
-    }
-
-    /* SUB-ABAS */
-    .sub-tabs {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 8px;
-    }
-
-    .sub-tab-btn {
-      padding: 8px 16px;
-      border: 1px solid var(--border-color);
-      background: #f8f9fa;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.88rem;
-      color: var(--accent-teal);
-    }
-
-    .sub-tab-btn.active {
-      background: var(--accent-teal);
-      color: white;
-      border-color: var(--accent-teal);
+      background-color: var(--accent-orange);
+      color: #000;
+      border-color: var(--accent-orange);
     }
 
     .tab-content {
       display: none;
-      background: var(--card-bg);
-      padding: 25px;
-      border-radius: 0 0 8px 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     .tab-content.active {
       display: block;
     }
 
-    .tab-footer-nav {
-      margin-top: 25px;
-      padding-top: 15px;
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      justify-content: flex-end;
-      gap: 12px;
-    }
-
-    /* FIELDSETS */
-    fieldset {
-      border: 1px solid var(--border-color);
+    .section-box {
+      background-color: var(--card-bg);
       border-radius: 6px;
       padding: 15px;
-      margin-bottom: 20px;
-      background: #ffffff;
+      margin-bottom: 15px;
+      border: 1px solid var(--border-color);
     }
 
-    legend {
-      font-weight: 700;
-      color: var(--accent-teal);
-      padding: 0 8px;
+    .section-title {
+      color: var(--accent-orange);
+      font-size: 1.05rem;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 5px;
+    }
+
+    details {
+      background-color: #222222;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 12px;
+      padding: 12px;
+    }
+
+    summary {
+      font-weight: bold;
+      color: var(--accent-orange);
+      cursor: pointer;
       font-size: 0.95rem;
     }
 
-    /* GRID */
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 12px;
-      align-items: center;
+    details[open] summary {
+      margin-bottom: 12px;
+      border-bottom: 1px dashed var(--border-color);
+      padding-bottom: 5px;
     }
 
-    .col-12 { grid-column: span 12; }
-    .col-9  { grid-column: span 9; }
-    .col-8  { grid-column: span 8; }
-    .col-7  { grid-column: span 7; }
-    .col-6  { grid-column: span 6; }
-    .col-5  { grid-column: span 5; }
-    .col-4  { grid-column: span 4; }
-    .col-3  { grid-column: span 3; }
-    .col-2  { grid-column: span 2; }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
 
-    @media (max-width: 768px) {
-      .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9 {
-        grid-column: span 12;
-      }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 10px;
     }
 
     .form-group {
       display: flex;
       flex-direction: column;
-      position: relative;
+      gap: 4px;
     }
 
-    .form-group label, 
-    fieldset > label, 
-    .form-grid label {
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+
+    label {
       font-size: 0.8rem;
-      font-weight: 600;
-      color: #444444;
-      margin-bottom: 3px;
+      color: var(--text-muted);
     }
 
-    input[type="text"],
-    input[type="email"],
-    input[type="date"],
-    select,
-    textarea {
+    input, select {
       width: 100%;
-      padding: 8px 10px;
+      padding: 10px;
+      background-color: #1a1a1a;
       border: 1px solid var(--border-color);
       border-radius: 4px;
-      font-size: 0.88rem;
-      outline: none;
-      background-color: #fff;
+      color: var(--text-light);
+      font-size: 0.9rem;
     }
 
-    /* ESTILO PAXTU - OBRIGATÓRIOS */
-    .req-field {
-      border: 1.5px solid var(--required-border) !important;
-      background-color: var(--required-bg) !important;
-    }
-
-    .req-field-container {
-      position: relative;
-    }
-
-    .req-dot {
-      position: absolute;
-      top: 50%;
-      left: 6px;
-      transform: translateY(-50%);
-      width: 12px;
-      height: 12px;
-      background-color: #ffc107;
-      border-radius: 50%;
-      pointer-events: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: bold;
-    }
-    .req-dot::after { content: '!'; }
-
-    input.req-field, select.req-field {
-      padding-left: 22px !important;
-    }
-
-    .btn-action {
-      background-color: #ffffff;
-      border: 1px solid var(--accent-teal);
-      color: var(--accent-teal);
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    .btn-action:hover {
-      background-color: var(--accent-teal);
-      color: #ffffff;
-    }
-
-    .checkbox-group, .radio-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.88rem;
-      margin: 4px 0;
-    }
-
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 10px;
-      margin-top: 6px;
-    }
-
-    .hidden { display: none !important; }
-
-    .conditional-box {
-      background: #fdfdfd;
-      border-left: 3px solid var(--accent-teal);
-      padding: 10px 14px;
-      margin-top: 8px;
-      border-radius: 0 4px 4px 0;
-    }
-
-    /* TABELA DE MEDICAMENTOS */
-    .med-table {
+    textarea {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
+      padding: 10px;
+      background-color: #1a1a1a;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .print-text-display {
+      display: none;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-size: 0.85rem;
+      padding: 2px 0;
+      border-bottom: 1px solid #888;
+      margin-bottom: 4px;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 5px;
+    }
+
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
       font-size: 0.85rem;
     }
 
-    .med-table th, .med-table td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
+    .checkbox-item input[type="checkbox"] {
+      width: auto;
     }
 
-    .med-table th {
-      background-color: var(--accent-teal);
-      color: white;
-    }
-
-    /* ASSINATURA DIGITAL */
-    .signature-area {
-      border: 2px dashed var(--accent-teal);
-      border-radius: 6px;
-      background: #fafafa;
-      text-align: center;
-      padding: 10px;
-      margin-top: 15px;
-    }
-
-    #signature-canvas {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background: #fff;
-      cursor: crosshair;
-      touch-action: none;
-      max-width: 100%;
-    }
-
-    /* BOTÕES FINAIS */
-    .form-actions {
+    .dynamic-row {
       display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-top: 25px;
+      gap: 8px;
+      margin-bottom: 8px;
+      align-items: center;
     }
 
-    .btn {
-      padding: 10px 20px;
+    .btn-add {
+      background-color: var(--accent-orange);
+      color: #000;
       border: none;
-      border-radius: 5px;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-remove {
+      background-color: #cc0000;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .terms-box {
+      background-color: #181818;
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      max-height: 200px;
+      overflow-y: auto;
+      margin-bottom: 12px;
+    }
+
+    .terms-box h4 {
+      color: var(--accent-orange);
+      margin-top: 6px;
+      margin-bottom: 2px;
+    }
+
+    .signature-area {
+      display: none;
+      margin-top: 20px;
+    }
+
+    .signature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #000;
+      padding-top: 5px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #000;
+    }
+
+    #recibo-print-template, #nota-servico-print-template {
+      display: none;
+    }
+
+    footer {
+      background-color: #121212;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .footer-info {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .footer-info a {
+      color: var(--accent-orange);
+      text-decoration: none;
+    }
+
+    .qr-code-img {
+      max-width: 80px;
+      height: auto;
+      background: white;
+      padding: 4px;
+      border-radius: 4px;
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      margin-bottom: 20px;
+    }
+
+    .btn-action {
+      flex: 1;
+      min-width: 130px;
+      padding: 14px;
+      border: none;
+      border-radius: 6px;
       font-weight: bold;
       font-size: 0.9rem;
       cursor: pointer;
-      transition: all 0.2s;
     }
 
-    .btn-primary { background-color: var(--primary-color); color: #fff; }
-    .btn-primary:hover { background-color: var(--primary-hover); }
-
-    .btn-secondary { background-color: var(--accent-teal); color: #fff; }
-    .btn-secondary:hover { opacity: 0.9; }
-
-    .btn-outline { background-color: transparent; border: 1.5px solid var(--primary-color); color: var(--primary-color); }
-    .btn-outline:hover { background-color: var(--primary-color); color: #fff; }
-
-    .btn-danger { background-color: var(--danger-color); color: #fff; }
-    .btn-danger:hover { opacity: 0.9; }
+    .btn-save { background-color: #28a745; color: white; }
+    .btn-share { background-color: #17a2b8; color: white; }
+    .btn-print { background-color: var(--accent-orange); color: black; }
+    .btn-clear { background-color: #dc3545; color: white; }
+    .btn-delete { background-color: #d9534f; color: white; margin-top: 10px; width: 100%; padding: 10px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; }
 
     @media print {
-      .tabs-wrapper, .tabs-nav, .sub-tabs, .form-actions, .btn-action, .btn, .tab-footer-nav {
+      @page {
+        size: A4;
+        margin: 8mm 10mm 8mm 10mm;
+      }
+
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-size: 9pt;
+        line-height: 1.25;
+      }
+
+      header {
+        background-color: #ffffff !important;
+        border: 1px solid #000000 !important;
+        border-radius: 4px;
+        padding: 6px 10px;
+        margin-bottom: 8px;
+      }
+
+      .header-title { color: #000000 !important; font-size: 1.4rem; }
+      .header-subtitle, .header-contacts { color: #333333 !important; font-size: 0.75rem; }
+
+      .doc-print-header-title { display: block !important; }
+
+      .section-box, details {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: 1px solid #cccccc !important;
+        border-radius: 4px;
+        padding: 6px 8px !important;
+        margin-bottom: 6px !important;
+        page-break-inside: avoid;
+      }
+
+      summary {
+        color: #000000 !important;
+        font-size: 0.85rem;
+        list-style: none !important;
+        border-bottom: 1px solid #000 !important;
+        padding-bottom: 2px !important;
+        margin-bottom: 4px !important;
+      }
+
+      summary::-webkit-details-marker { display: none !important; }
+      .section-title { color: #000000 !important; font-size: 0.85rem; border-bottom: 1px solid #000000 !important; margin-bottom: 4px !important; }
+      label { color: #333333 !important; font-size: 0.75rem; font-weight: bold; }
+
+      input, select {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        border-bottom: 1px solid #888888 !important;
+        border-radius: 0 !important;
+        padding: 1px 2px !important;
+        font-size: 0.85rem !important;
+        height: auto !important;
+      }
+
+      textarea { display: none !important; }
+      .print-text-display { display: block !important; }
+
+      .tabs-nav, .action-buttons, .btn-add, .btn-remove, #btn-salvar-cliente, #select-cliente-wrapper, .btn-delete {
         display: none !important;
       }
-      .tab-content {
-        display: block !important;
-        box-shadow: none !important;
+
+      details { display: block !important; }
+
+      .terms-box {
+        max-height: none !important;
+        overflow: visible !important;
+        background: transparent !important;
+        border: none !important;
         padding: 0 !important;
+        font-size: 0.72rem !important;
+        line-height: 1.2 !important;
       }
-      body { background-color: #fff; }
-      fieldset { page-break-inside: avoid; }
-    }
 
-    /* ESTILOS TEMPORÁRIOS PARA A GERAÇÃO DO PDF / IMPRESSÃO */
-    body.generating-pdf .tabs-wrapper,
-    body.generating-pdf .tabs-nav,
-    body.generating-pdf .sub-tabs,
-    body.generating-pdf .form-actions,
-    body.generating-pdf .btn-action,
-    body.generating-pdf .btn,
-    body.generating-pdf .tab-footer-nav {
-      display: none !important;
-    }
+      .terms-box h4 { color: #000000 !important; font-size: 0.75rem; margin-top: 3px; }
+      .signature-area { display: block !important; }
 
-    body.generating-pdf .tab-content {
-      display: block !important;
-      box-shadow: none !important;
-      padding: 10px 0 !important;
-      margin-bottom: 20px !important;
-    }
+      footer {
+        background-color: #ffffff !important;
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+        padding: 6px 10px;
+        margin-top: 8px;
+        page-break-inside: avoid;
+      }
 
-    body.generating-pdf #subtab-resp1,
-    body.generating-pdf #subtab-resp2 {
-      display: block !important;
-    }
+      .footer-info { color: #000000 !important; font-size: 0.7rem; }
+      .footer-info a { color: #000000 !important; }
+      .qr-code-img { border: 1px solid #000000; }
 
-    body.generating-pdf {
-      background-color: #ffffff !important;
-      color: #000000 !important;
-    }
+      body.printing-recibo #ordem-servico { display: none !important; }
+      body.printing-recibo #emitir-documentos-form { display: none !important; }
+      body.printing-recibo #recibo-print-template { display: block !important; }
 
-    body.generating-pdf fieldset {
-      page-break-inside: avoid !important;
-      margin-bottom: 12px !important;
-      border: 1px solid #b0b0b0 !important;
-    }
-
-    body.generating-pdf input[type="text"],
-    body.generating-pdf input[type="email"],
-    body.generating-pdf input[type="date"],
-    body.generating-pdf select,
-    body.generating-pdf textarea {
-      border: none !important;
-      border-bottom: 1px solid #555555 !important;
-      border-radius: 0 !important;
-      background: transparent !important;
-      padding: 2px 4px !important;
-      box-shadow: none !important;
-    }
-
-    body.generating-pdf .req-dot {
-      display: none !important;
-    }
-
-    body.generating-pdf input.req-field,
-    body.generating-pdf select.req-field {
-      padding-left: 4px !important;
-      background-color: transparent !important;
-      border: none !important;
-      border-bottom: 1px solid #555555 !important;
-    }
-
-    body.generating-pdf ::placeholder {
-      color: transparent !important;
+      body.printing-nota #ordem-servico { display: none !important; }
+      body.printing-nota #emitir-documentos-form { display: none !important; }
+      body.printing-nota #nota-servico-print-template { display: block !important; }
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
   <!-- CABEÇALHO -->
-  <header class="header">
-    <div class="header-logo-left">
-      <img src="logo_gem.png" alt="Logo GEM" class="logo-img">
+  <header>
+    <img src="logoesquerda.png" alt="Logo Esquerda" class="header-logo" onerror="this.style.display='none'">
+    <div class="header-info">
+      <div class="header-title">DONZAMB@</div>
+      <div class="header-subtitle">Soluções Técnicas em T.I. – Legal, Segura e Profissional</div>
+      <div class="header-contacts">WhatsApp: (11) 9 6083-4022 | TEL: (11) 9 4077-4175</div>
     </div>
-    <div class="header-title">
-      <h2>UNIÃO DOS ESCOTEIROS DO BRASIL</h2>
-      <h1>Grupo Escoteiro Memorial 350 SP</h1>
-      <p>Av. Doutor Altair Martins, 520 - Raposo Tavares, Osasco SP</p>
-      <p>CEP: 06149-020 • E-mail: grupoescoteiromemorial.350@gmail.com</p>
-      <p>Tel: (11) 2884-5555 • Whats: (11) 99745-7599 / (11) 94077-4175</p>
-    </div>
-    <div class="header-logo-right">
-      <img src="logo_ueb.png" alt="Logo Escoteiros do Brasil" class="logo-img">
-    </div>
+    <img src="logodireita.png" alt="Logo Direita" class="header-logo" onerror="this.style.display='none'">
   </header>
 
-  <!-- MAIN -->
-  <main>
-    <div class="tabs-wrapper">
-      <div class="tabs-nav" id="tabsNav">
-        <button type="button" class="tab-btn active" id="btn-tab-basicas" onclick="tentarMudarAba('basicas')">INFORMAÇÕES BÁSICAS</button>
-        <button type="button" class="tab-btn" id="btn-tab-responsaveis" onclick="tentarMudarAba('responsaveis')">RESPONSÁVEIS</button>
-        <button type="button" class="tab-btn" id="btn-tab-medica" onclick="tentarMudarAba('medica')">FICHA MÉDICA</button>
-      </div>
-      <div class="tabs-scroll-hint" id="tabsScrollHint" onclick="scrollTabsRight()">
-        <span>Mais abas</span> <span class="arrow-anim">➔</span>
+  <!-- MENU DE ABAS -->
+  <div class="tabs-nav">
+    <button type="button" class="tab-btn active" id="btn-tab-os" onclick="openTab('ordem-servico')">CRIAR NOVO PEDIDO</button>
+    <button type="button" class="tab-btn" id="btn-tab-docs" onclick="openTab('emitir-documentos')">GERAR DOCUMENTOS E RECIBOS</button>
+  </div>
+
+  <!-- ABA 1: CRIAR NOVO PEDIDO -->
+  <div id="ordem-servico" class="tab-content active">
+
+    <div class="doc-print-header-title">ORÇAMENTO / ORDEM DE SERVIÇO</div>
+    
+    <div class="section-box">
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Data:</label>
+          <input type="text" id="data-pedido">
+        </div>
+        <div class="form-group">
+          <label>Pedido nº:</label>
+          <input type="text" id="numero-pedido" style="color: var(--accent-orange); font-weight: bold;">
+        </div>
       </div>
     </div>
 
-    <form id="cadastroForm">
-
-      <!-- ABA 1: INFORMAÇÕES BÁSICAS -->
-      <div id="tab-basicas" class="tab-content active">
-        <div class="form-grid">
-          
-          <div class="form-group col-8">
-            <label for="nome_completo">Nome Completo</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="nome_completo" class="req-field" placeholder="Nome Completo" required>
-            </div>
-          </div>
-
-          <div class="form-group col-4">
-            <label for="nome_abreviado">Nome Abreviado (Será impresso na credencial)</label>
-            <input type="text" id="nome_abreviado" placeholder="Nome Abreviado">
-          </div>
-
-          <div class="form-group col-4">
-            <label>Gênero</label>
-            <div style="display: flex; gap: 15px; margin-top: 6px;">
-              <label class="radio-group">
-                <input type="radio" name="assoc_sexo" value="Masculino" required> Masculino
-              </label>
-              <label class="radio-group">
-                <input type="radio" name="assoc_sexo" value="Feminino" required> Feminino
-              </label>
-            </div>
-          </div>
-
-          <div class="form-group col-4">
-            <label for="cor_raca">Cor ou Raça</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="cor_raca" class="req-field" required>
-                <option value="">Selecione</option>
-                <option value="Branca">Branca</option>
-                <option value="Preta">Preta</option>
-                <option value="Parda">Parda</option>
-                <option value="Amarela">Amarela</option>
-                <option value="Indígena">Indígena</option>
-                <option value="Não declarada">Não declarada</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group col-4">
-            <label for="data_nascimento">Data de Nascimento</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="date" id="data_nascimento" class="req-field" required>
-            </div>
-          </div>
-
-          <div class="form-group col-4">
-            <label for="uf_nascimento">UF Nascimento</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="uf_nascimento" class="req-field" required>
-                <option value="">Selecione a UF</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group col-8">
-            <label for="cidade_nascimento">Cidade de Nascimento</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="cidade_nascimento" class="req-field" placeholder="Cidade de Nascimento" required>
-            </div>
-          </div>
-
-          <div class="form-group col-8">
-            <label for="escolaridade">Escolaridade</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="escolaridade" class="req-field" required>
-                <option value="">Selecione a escolaridade</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group col-4">
-            <label for="profissao">Profissão</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="profissao" class="req-field" required>
-                <option value="">Selecione a profissão</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-group col-6">
-            <label for="area_atuacao">Área de Atuação</label>
-            <input type="text" id="area_atuacao" placeholder="Área de Atuação">
-          </div>
-          <div class="form-group col-4">
-            <label for="escola">Escola</label>
-            <input type="text" id="escola" placeholder="Escola">
-          </div>
-          <div class="form-group col-2">
-            <label for="serie">Série</label>
-            <input type="text" id="serie" placeholder="Série">
-          </div>
-
-          <div class="form-group col-12">
-            <label for="local_trabalho">Local de Trabalho</label>
-            <input type="text" id="local_trabalho" placeholder="Local de Trabalho">
-          </div>
-
-          <!-- Endereço -->
-          <div class="form-group col-4">
-            <label for="assoc_cep">CEP</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="assoc_cep" class="req-field" placeholder="CEP (sem traço)" required onkeyup="buscarCEP(this.value, 'assoc_')">
-            </div>
-          </div>
-          <div class="form-group col-8">
-            <label for="assoc_endereco">Endereço</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="assoc_endereco" class="req-field" placeholder="Endereço" required>
-            </div>
-          </div>
-
-          <div class="form-group col-3">
-            <label for="assoc_numero">Número</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="assoc_numero" class="req-field" placeholder="Número" required>
-            </div>
-          </div>
-          <div class="form-group col-4">
-            <label for="assoc_complemento">Complemento</label>
-            <input type="text" id="assoc_complemento" placeholder="Complemento">
-          </div>
-          <div class="form-group col-5">
-            <label for="assoc_bairro">Bairro</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="assoc_bairro" class="req-field" placeholder="Bairro" required>
-            </div>
-          </div>
-
-          <div class="form-group col-6">
-            <label for="assoc_uf">UF</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="assoc_uf" class="req-field" required>
-                <option value="">Selecione a UF</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group col-6">
-            <label for="assoc_cidade">Cidade</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="assoc_cidade" class="req-field" placeholder="Cidade" required>
-            </div>
-          </div>
-
-          <!-- Contatos -->
-          <div class="form-group col-4">
-            <label for="tel_residencial">Telefone Residencial</label>
-            <input type="text" id="tel_residencial" placeholder="Telefone Residencial">
-          </div>
-          <div class="form-group col-4">
-            <label for="tel_comercial">Telefone Comercial</label>
-            <input type="text" id="tel_comercial" placeholder="Telefone Comercial">
-          </div>
-          <div class="form-group col-4">
-            <label for="tel_celular">Telefone Celular</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="tel_celular" class="req-field" placeholder="Telefone Celular" required>
-            </div>
-          </div>
-
-          <div class="form-group col-8">
-            <label for="email">E-mail</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="email" id="email" class="req-field" placeholder="E-mail" required>
-            </div>
-          </div>
-          <div class="form-group col-4">
-            <label for="id_escoteiros">ID Escoteiros</label>
-            <input type="text" id="id_escoteiros" placeholder="id@escoteiros">
-          </div>
-
-          <div class="form-group col-6">
-            <label for="rg">RG ou Passaporte</label>
-            <input type="text" id="rg" placeholder="RG ou Passaporte">
-          </div>
-          <div class="form-group col-6">
-            <label for="orgao_expedidor">Órgão Expedidor</label>
-            <input type="text" id="orgao_expedidor" placeholder="Órgão Expedidor">
-          </div>
-
-          <div class="form-group col-6">
-            <label for="cpf">CPF</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="cpf" class="req-field" placeholder="CPF" required>
-            </div>
-          </div>
-          <div class="form-group col-6" style="display: flex; align-items: flex-end; padding-bottom: 5px;">
-            <label class="checkbox-group"><input type="checkbox" id="estrangeiro_sem_cpf"> Estrangeiro sem CPF</label>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;">
-          <fieldset>
-            <legend>Clube de Serviço</legend>
-            <div class="checkbox-grid">
-              <label class="checkbox-group"><input type="checkbox" id="clube_lions"> Lions</label>
-              <label class="checkbox-group"><input type="checkbox" id="clube_maconica"> Loja maçônica</label>
-              <label class="checkbox-group"><input type="checkbox" id="clube_rotary"> Rotary clube</label>
-              <label class="checkbox-group"><input type="checkbox" id="clube_outros"> Outros</label>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Religião</legend>
-            <div style="display: flex; flex-direction: column; gap: 8px;">
-              <div class="form-group">
-                <label for="religiao">Religião</label>
-                <select id="religiao" onchange="atualizarDenominacoes()">
-                  <option value="">Selecione a Religião</option>
-                  <option value="Católica">Católica</option>
-                  <option value="Evangélica">Evangélica</option>
-                  <option value="Espírita">Espírita</option>
-                  <option value="Matriz Africana">Matriz Africana</option>
-                  <option value="Judaísmo">Judaísmo</option>
-                  <option value="Islamismo">Islamismo</option>
-                  <option value="Budismo">Budismo</option>
-                  <option value="Outras">Outras</option>
-                  <option value="Sem religião">Sem religião</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="denominacao">Denominação</label>
-                <select id="denominacao">
-                  <option value="">Selecione a Denominação</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
-        </div>
-
-        <fieldset>
-          <legend>Radioamador</legend>
-          <div class="form-grid">
-            <div class="form-group col-8">
-              <label for="radio_indicativo">Indicativo de chamada</label>
-              <input type="text" id="radio_indicativo" placeholder="Indicativo de chamada (Estação de Radioamador)">
-            </div>
-            <div class="form-group col-4">
-              <label for="radio_classe">Classe</label>
-              <input type="text" id="radio_classe" placeholder="Classe">
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- BOTÃO NAVEGAÇÃO DE ABA -->
-        <div class="tab-footer-nav">
-          <button type="button" class="btn btn-primary" onclick="tentarMudarAba('responsaveis')">
-            Avançar para Responsáveis ➔
-          </button>
-        </div>
-      </div>
-
-      <!-- ABA 2: RESPONSÁVEIS -->
-      <div id="tab-responsaveis" class="tab-content">
-        <div class="sub-tabs">
-          <button type="button" class="sub-tab-btn active" id="btn-sub-resp1" onclick="switchSubTab('resp1')">1º responsável</button>
-          <button type="button" class="sub-tab-btn" id="btn-sub-resp2" onclick="switchSubTab('resp2')">2º responsável</button>
-        </div>
-
-        <!-- 1º Responsável -->
-        <div id="subtab-resp1">
-          <div class="form-grid">
-            <div class="form-group col-4">
-              <label for="resp1_parentesco">Parentesco</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <select id="resp1_parentesco" class="req-field" required>
-                  <option value="">Parentesco</option>
-                  <option value="Pai">Pai</option>
-                  <option value="Mãe">Mãe</option>
-                  <option value="Tutor Legal">Tutor Legal</option>
-                  <option value="Outro">Outro</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group col-8">
-              <label for="resp1_nome">Nome Completo do Responsável</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_nome" class="req-field" placeholder="Nome Completo do Responsável" required>
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label>Gênero</label>
-              <div style="display: flex; gap: 15px; margin-top: 6px;">
-                <label class="radio-group"><input type="radio" name="resp1_sexo" value="Masculino" checked required> Masculino</label>
-                <label class="radio-group"><input type="radio" name="resp1_sexo" value="Feminino" required> Feminino</label>
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp1_data_nascimento">Data de Nascimento</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="date" id="resp1_data_nascimento" class="req-field" required>
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp1_cpf">CPF</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_cpf" class="req-field" placeholder="CPF" required>
-              </div>
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp1_escolaridade">Escolaridade</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <select id="resp1_escolaridade" class="req-field" required>
-                  <option value="">Selecione a escolaridade</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp1_profissao">Profissão</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <select id="resp1_profissao" class="req-field" required>
-                  <option value="">Selecione a profissão</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp1_celular">Telefone Celular</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_celular" class="req-field" placeholder="Telefone Celular" required>
-              </div>
-            </div>
-
-            <div class="form-group col-8">
-              <label for="resp1_email">E-mail</label>
-              <input type="email" id="resp1_email" placeholder="E-mail">
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp1_area_atuacao">Área de Atuação</label>
-              <input type="text" id="resp1_area_atuacao" placeholder="Área de Atuação">
-            </div>
-            <div class="form-group col-6">
-              <label for="resp1_local_trabalho">Local de Trabalho</label>
-              <input type="text" id="resp1_local_trabalho" placeholder="Local de Trabalho">
-            </div>
-
-            <div class="form-group col-12" style="margin-top: 5px;">
-              <button type="button" class="btn-action" onclick="copiarEnderecoAssociado('resp1_')">Mesmo endereço do associado</button>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp1_cep">CEP</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_cep" class="req-field" placeholder="CEP" required onkeyup="buscarCEP(this.value, 'resp1_')">
-              </div>
-            </div>
-            <div class="form-group col-8">
-              <label for="resp1_endereco">Endereço</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_endereco" class="req-field" placeholder="Endereço" required>
-              </div>
-            </div>
-
-            <div class="form-group col-3">
-              <label for="resp1_numero">Número</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_numero" class="req-field" placeholder="Número" required>
-              </div>
-            </div>
-            <div class="form-group col-4">
-              <label for="resp1_complemento">Complemento</label>
-              <input type="text" id="resp1_complemento" placeholder="Complemento">
-            </div>
-            <div class="form-group col-5">
-              <label for="resp1_bairro">Bairro</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_bairro" class="req-field" placeholder="Bairro" required>
-              </div>
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp1_uf">UF</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <select id="resp1_uf" class="req-field" required>
-                  <option value="">Selecione a UF</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group col-6">
-              <label for="resp1_cidade">Cidade</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="resp1_cidade" class="req-field" placeholder="Cidade" required>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2º Responsável (OPCIONAL) -->
-        <div id="subtab-resp2" class="hidden">
-          <div class="form-grid">
-            <div class="form-group col-4">
-              <label for="resp2_parentesco">Parentesco</label>
-              <select id="resp2_parentesco">
-                <option value="">Parentesco</option>
-                <option value="Pai">Pai</option>
-                <option value="Mãe">Mãe</option>
-                <option value="Tutor Legal">Tutor Legal</option>
-                <option value="Outro">Outro</option>
-              </select>
-            </div>
-
-            <div class="form-group col-8">
-              <label for="resp2_nome">Nome Completo do Responsável</label>
-              <input type="text" id="resp2_nome" placeholder="Nome Completo do Responsável">
-            </div>
-
-            <div class="form-group col-4">
-              <label>Gênero</label>
-              <div style="display: flex; gap: 15px; margin-top: 6px;">
-                <label class="radio-group"><input type="radio" name="resp2_sexo" value="Masculino"> Masculino</label>
-                <label class="radio-group"><input type="radio" name="resp2_sexo" value="Feminino"> Feminino</label>
-              </div>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp2_data_nascimento">Data de Nascimento</label>
-              <input type="date" id="resp2_data_nascimento">
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp2_cpf">CPF</label>
-              <input type="text" id="resp2_cpf" placeholder="CPF">
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp2_escolaridade">Escolaridade</label>
-              <select id="resp2_escolaridade">
-                <option value="">Selecione a escolaridade</option>
-              </select>
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp2_profissao">Profissão</label>
-              <select id="resp2_profissao">
-                <option value="">Selecione a profissão</option>
-              </select>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp2_celular">Telefone Celular</label>
-              <input type="text" id="resp2_celular" placeholder="Telefone Celular">
-            </div>
-
-            <div class="form-group col-8">
-              <label for="resp2_email">E-mail</label>
-              <input type="email" id="resp2_email" placeholder="E-mail">
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp2_area_atuacao">Área de Atuação</label>
-              <input type="text" id="resp2_area_atuacao" placeholder="Área de Atuação">
-            </div>
-            <div class="form-group col-6">
-              <label for="resp2_local_trabalho">Local de Trabalho</label>
-              <input type="text" id="resp2_local_trabalho" placeholder="Local de Trabalho">
-            </div>
-
-            <div class="form-group col-12" style="margin-top: 5px;">
-              <button type="button" class="btn-action" onclick="copiarEnderecoAssociado('resp2_')">Mesmo endereço do associado</button>
-            </div>
-
-            <div class="form-group col-4">
-              <label for="resp2_cep">CEP</label>
-              <input type="text" id="resp2_cep" placeholder="CEP" onkeyup="buscarCEP(this.value, 'resp2_')">
-            </div>
-            <div class="form-group col-8">
-              <label for="resp2_endereco">Endereço</label>
-              <input type="text" id="resp2_endereco" placeholder="Endereço">
-            </div>
-
-            <div class="form-group col-3">
-              <label for="resp2_numero">Número</label>
-              <input type="text" id="resp2_numero" placeholder="Número">
-            </div>
-            <div class="form-group col-4">
-              <label for="resp2_complemento">Complemento</label>
-              <input type="text" id="resp2_complemento" placeholder="Complemento">
-            </div>
-            <div class="form-group col-5">
-              <label for="resp2_bairro">Bairro</label>
-              <input type="text" id="resp2_bairro" placeholder="Bairro">
-            </div>
-
-            <div class="form-group col-6">
-              <label for="resp2_uf">UF</label>
-              <select id="resp2_uf">
-                <option value="">Selecione a UF</option>
-              </select>
-            </div>
-            <div class="form-group col-6">
-              <label for="resp2_cidade">Cidade</label>
-              <input type="text" id="resp2_cidade" placeholder="Cidade">
-            </div>
-          </div>
-        </div>
-
-        <!-- BOTÕES NAVEGAÇÃO DE ABA -->
-        <div class="tab-footer-nav" style="justify-content: space-between; flex-wrap: wrap;">
-          <button type="button" class="btn btn-outline" onclick="forcarMudancaAba('basicas')">
-            🠔 Voltar: Informações Básicas
-          </button>
-          <button type="button" class="btn btn-primary" onclick="tentarMudarAba('medica')">
-            Avançar para Ficha Médica ➔
-          </button>
-        </div>
-      </div>
-
-      <!-- ABA 3: FICHA MÉDICA COMPLETA -->
-      <div id="tab-medica" class="tab-content">
-        
-        <!-- Topo da Ficha Médica -->
-        <div class="form-grid" style="margin-bottom: 20px;">
-          <div class="form-group col-3">
-            <label for="med_altura">Altura (ex: 1.70)</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="med_altura" class="req-field" placeholder="Altura (ex: 1.70)" required>
-            </div>
-          </div>
-          <div class="form-group col-3">
-            <label for="med_peso">Peso (ex: 65kg)</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <input type="text" id="med_peso" class="req-field" placeholder="Peso (ex: 65kg)" required>
-            </div>
-          </div>
-          <div class="form-group col-3">
-            <label for="med_tiposanguineo">Tipo Sanguíneo</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="med_tiposanguineo" class="req-field" required>
-                <option value="">Tipo Sanguíneo</option>
-                <option value="A">A</option><option value="B">B</option><option value="AB">AB</option><option value="O">O</option>
-              </select>
-            </div>
-          </div>
-          <div class="form-group col-3">
-            <label for="med_fatorrh">Fator RH</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="med_fatorrh" class="req-field" required>
-                <option value="">Fator RH</option>
-                <option value="+">Positivo (+)</option><option value="-">Negativo (-)</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- 1. Equipamentos de Auxílio -->
-        <fieldset>
-          <legend>Utiliza os seguintes equipamentos de auxílio</legend>
-          <div class="form-group" style="max-width: 200px; margin-bottom: 8px;">
-            <label for="med_auxilio_opt">Utiliza equipamentos?</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="med_auxilio_opt" class="req-field" required onchange="toggleBox('auxilio_box', this.value === 'Sim')">
-                <option value="Não">Não</option>
-                <option value="Sim">Sim</option>
-              </select>
-            </div>
-          </div>
-          <div id="auxilio_box" class="conditional-box hidden">
-            <div class="checkbox-grid">
-              <label class="checkbox-group"><input type="checkbox" id="aux_oculos"> Óculos</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_lentes"> Lentes de contato</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_aparelho_dentario"> Aparelhos dentários</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_sondas"> Sondas</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_marcapasso"> Marca-passo</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_audicao"> Aparelhos de audição</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_bomba_insulina"> Bomba de insulina</label>
-              <label class="checkbox-group"><input type="checkbox" id="aux_outros_check" onchange="toggleBox('aux_outros_desc_box', this.checked)"> Outros</label>
-            </div>
-            <div id="aux_outros_desc_box" class="hidden" style="margin-top: 8px;">
-              <input type="text" id="aux_outros_desc" placeholder="Outros equipamentos...">
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 2. Saúde Física -->
-        <fieldset>
-          <legend>Saúde física</legend>
-          
-          <div style="margin-bottom: 12px;">
-            <label style="font-size:0.88rem; font-weight:600;">Apresenta algum problema crônico de saúde?</label>
-            <div style="display:flex; gap:15px; margin-top:4px;">
-              <label class="radio-group"><input type="radio" name="prob_cronico" value="Não" checked onclick="toggleBox('prob_cronico_box', false)"> Não</label>
-              <label class="radio-group"><input type="radio" name="prob_cronico" value="Sim" onclick="toggleBox('prob_cronico_box', true)"> Sim</label>
-            </div>
-            <div id="prob_cronico_box" class="conditional-box hidden">
-              <div class="form-group">
-                <label for="prob_cronico_med">Medicação para este problema</label>
-                <div class="req-field-container">
-                  <span class="req-dot"></span>
-                  <input type="text" id="prob_cronico_med" class="req-field" placeholder="Medicação para este problema">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 12px;">
-            <label style="font-size:0.88rem; font-weight:600;">Faz acompanhamento médico regular?</label>
-            <div style="display:flex; gap:15px; margin-top:4px;">
-              <label class="radio-group"><input type="radio" name="acomp_medico" value="Não" checked onclick="toggleBox('acomp_medico_box', false)"> Não</label>
-              <label class="radio-group"><input type="radio" name="acomp_medico" value="Sim" onclick="toggleBox('acomp_medico_box', true)"> Sim</label>
-            </div>
-            <div id="acomp_medico_box" class="conditional-box hidden">
-              <div class="form-group">
-                <label for="acomp_medico_especialidade">Especialidade</label>
-                <div class="req-field-container">
-                  <span class="req-dot"></span>
-                  <input type="text" id="acomp_medico_especialidade" class="req-field" placeholder="Especialidade">
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <label style="font-size:0.88rem; font-weight:600; display:block; margin-top:10px;">Apresenta alguma dessas enfermidades crônicas?</label>
-          <div class="checkbox-grid">
-            <label class="checkbox-group"><input type="checkbox" id="enf_asma"> Asma ou Bronquite</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_rinite"> Rinite ou Sinusite</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_hipertensao"> Hipertensão</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_diabetes"> Diabetes</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_epilepsia"> Convulsões ou Epilepsia</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_dermato"> Problemas dermatológicos</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_cardiaco"> Problemas cardíacos</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_renal"> Problemas renais</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_reuma"> Problemas reumatológicos</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_hemato"> Problemas hematológicos</label>
-            <label class="checkbox-group"><input type="checkbox" id="enf_outros"> Outros</label>
-          </div>
-          <div class="form-group" style="margin-top: 8px;">
-            <label for="enf_outros_desc">Especifique outros</label>
-            <input type="text" id="enf_outros_desc" placeholder="Especifique outros se houver">
-          </div>
-        </fieldset>
-
-        <!-- 3. Medicamentos em Uso -->
-        <fieldset>
-          <legend>Medicamentos em uso (contínuos ou não)</legend>
-          <div class="form-group" style="max-width: 200px; margin-bottom: 8px;">
-            <label for="meds_opt">Usa medicamentos?</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="meds_opt" class="req-field" required onchange="toggleBox('meds_box', this.value === 'Sim')">
-                <option value="Não">Não</option>
-                <option value="Sim">Sim</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="meds_box" class="conditional-box hidden">
-            <button type="button" class="btn-action" onclick="adicionarLinhaMedicamento()">+ Adicionar medicamento</button>
-            <table class="med-table" id="tabelaMedicamentos">
-              <thead>
-                <tr>
-                  <th>Nome do medicamento</th>
-                  <th>Uso contínuo</th>
-                  <th>Informações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td><input type="text" placeholder="Nome do remédio"></td>
-                  <td><select><option value="Sim">Sim</option><option value="Não">Não</option></select></td>
-                  <td><input type="text" placeholder="Dosagem / Horários"></td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div style="margin-top: 15px;">
-              <label style="font-size:0.85rem; font-weight:600;">Permite administrar medicamentos por profissionais em saúde que atuam no Grupo?</label>
-              <div style="display:flex; gap:15px; margin: 4px 0;">
-                <label class="radio-group"><input type="radio" name="permite_med" value="Sim"> Sim</label>
-                <label class="radio-group"><input type="radio" name="permite_med" value="Não" checked> Não</label>
-              </div>
-              <div class="form-group" style="margin-top: 5px;">
-                <label for="permite_med_info">Informações sobre a administração</label>
-                <input type="text" id="permite_med_info" placeholder="Informações sobre a administração por profissionais">
-              </div>
-            </div>
-
-            <div style="margin-top: 15px;">
-              <label style="font-size:0.85rem; font-weight:600;">O jovem tem autonomia e está treinado para administrar a sua medicação sozinho?</label>
-              <div style="display:flex; gap:15px; margin: 4px 0;">
-                <label class="radio-group"><input type="radio" name="autonomia_med" value="Sim"> Sim</label>
-                <label class="radio-group"><input type="radio" name="autonomia_med" value="Não" checked> Não</label>
-              </div>
-              <div class="form-group" style="margin-top: 5px;">
-                <label for="autonomia_med_info">Informações sobre a autonomia</label>
-                <input type="text" id="autonomia_med_info" placeholder="Informações sobre a autonomia na administração">
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 4. Emergências Médicas -->
-        <fieldset>
-          <legend>Emergências médicas</legend>
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <label class="checkbox-group"><input type="checkbox" id="emg_aguardar_pais"> Aguardar acompanhamento dos Pais/Responsáveis</label>
-            <label class="checkbox-group"><input type="checkbox" id="emg_aceita_decisoes"> Aceita decisões médicas</label>
-          </div>
-
-          <div style="margin-top: 12px;">
-            <label style="font-size:0.88rem; font-weight:600;">Avisar em emergências:</label>
-            <div style="display:flex; gap:15px; margin-top:4px;">
-              <label class="radio-group"><input type="radio" name="avisar_emergencia" value="Pais" checked> Pais</label>
-              <label class="radio-group"><input type="radio" name="avisar_emergencia" value="Outros"> Outros</label>
-            </div>
-          </div>
-
-          <div class="form-grid" style="margin-top: 10px;">
-            <div class="form-group col-8">
-              <label for="emergencia_nome">Nome do Contato de Emergência</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="emergencia_nome" class="req-field" placeholder="Nome do Contato de Emergência" required>
-              </div>
-            </div>
-            <div class="form-group col-4">
-              <label for="emergencia_tel">Telefone</label>
-              <div class="req-field-container">
-                <span class="req-dot"></span>
-                <input type="text" id="emergencia_tel" class="req-field" placeholder="Telefone" required>
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 5. Plano de Saúde -->
-        <fieldset>
-          <legend>Plano de saúde</legend>
-          <div class="form-group" style="max-width: 250px; margin-bottom: 8px;">
-            <label for="plano_opt">Convênio / Plano de Saúde</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="plano_opt" class="req-field" required onchange="toggleBox('plano_box', this.value !== 'Não/SUS')">
-                <option value="Não/SUS">Não/SUS</option>
-                <option value="Agemed">Agemed</option>
-                <option value="Amil">Amil</option>
-                <option value="Bradesco">Bradesco</option>
-                <option value="Notre Dame">Notre Dame</option>
-                <option value="Porto Seguro">Porto Seguro</option>
-                <option value="Unimed">Unimed</option>
-                <option value="Outro">Outro</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="plano_box" class="conditional-box hidden">
-            <div class="form-grid">
-              <div class="form-group col-6">
-                <label for="plano_carteirinha">Nº Carteirinha</label>
-                <div class="req-field-container">
-                  <span class="req-dot"></span>
-                  <input type="text" id="plano_carteirinha" class="req-field" placeholder="Nº Carteirinha">
-                </div>
-              </div>
-              <div class="form-group col-6">
-                <label for="plano_outro_especificar">Especifique o Plano</label>
-                <input type="text" id="plano_outro_especificar" placeholder="Especifique o Plano (caso tenha escolhido Outro)">
-              </div>
-              <div class="form-group col-8">
-                <label for="medico_preferencia">Médico de preferência</label>
-                <input type="text" id="medico_preferencia" placeholder="Médico de preferência">
-              </div>
-              <div class="form-group col-4">
-                <label for="medico_telefone">Telefone do Médico</label>
-                <input type="text" id="medico_telefone" placeholder="Telefone do Médico">
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 6. Alergias -->
-        <fieldset>
-          <legend>Alergias</legend>
-          <div class="form-group" style="max-width: 200px; margin-bottom: 8px;">
-            <label for="alergia_opt">Possui alergia?</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="alergia_opt" class="req-field" required onchange="toggleBox('alergia_box', this.value === 'Sim')">
-                <option value="Não">Não</option>
-                <option value="Sim">Sim</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="alergia_box" class="conditional-box hidden">
-            <div style="display:flex; flex-direction:column; gap:8px;">
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_inseto"> Picada de inseto</label>
-                <input type="text" id="alg_inseto_desc" placeholder="Detalhes / reações">
-              </div>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_med"> Medicamentos</label>
-                <input type="text" id="alg_med_desc" placeholder="Quais remédios?">
-              </div>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_plantas"> Plantas</label>
-                <input type="text" id="alg_plantas_desc" placeholder="Detalhes">
-              </div>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_alimentos"> Alimentos</label>
-                <input type="text" id="alg_alimentos_desc" placeholder="Quais alimentos?">
-              </div>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_acaro"> Ácaro</label>
-                <input type="text" id="alg_acaro_desc" placeholder="Detalhes">
-              </div>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_fungo"> Fungo</label>
-                <input type="text" id="alg_fungo_desc" placeholder="Detalhes">
-              </div>
-              <div style="display:flex; gap:10px; align-items:center;">
-                <label style="width:140px;" class="checkbox-group"><input type="checkbox" id="alg_outros"> Outros:</label>
-                <input type="text" id="alg_outros_desc" placeholder="Especifique">
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 7. Informações Gerais -->
-        <fieldset>
-          <legend>Informações gerais</legend>
-          <div style="display:flex; flex-direction:column; gap:10px;">
-            <div>
-              <label style="font-size:0.85rem;">Possui impedimento físico?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="imp_fisico" value="Não" checked onclick="toggleBox('imp_fisico_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="imp_fisico" value="Sim" onclick="toggleBox('imp_fisico_cite', true)"> Sim</label>
-              </div>
-              <div id="imp_fisico_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="imp_fisico_desc">Cite o impedimento</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="imp_fisico_desc" class="req-field" placeholder="Cite o impedimento"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Restrições a alimentos?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="rest_alimento" value="Não" checked onclick="toggleBox('rest_alimento_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="rest_alimento" value="Sim" onclick="toggleBox('rest_alimento_cite', true)"> Sim</label>
-              </div>
-              <div id="rest_alimento_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="rest_alimento_desc">Cite as restrições</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="rest_alimento_desc" class="req-field" placeholder="Cite as restrições"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Saber nadar?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="saber_nadar" value="Não" checked> Não</label>
-                <label class="radio-group"><input type="radio" name="saber_nadar" value="Sim"> Sim</label>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">É sonâmbulo?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="sonambulo" value="Não" checked> Não</label>
-                <label class="radio-group"><input type="radio" name="sonambulo" value="Sim"> Sim</label>
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 8. Saúde Mental -->
-        <fieldset>
-          <legend>Saúde mental</legend>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-            <div>
-              <label style="font-size:0.85rem;">Apresenta algum transtorno?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="transtorno" value="Não" checked onclick="toggleBox('transtorno_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="transtorno" value="Sim" onclick="toggleBox('transtorno_cite', true)"> Sim</label>
-              </div>
-              <div id="transtorno_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="transtorno_desc">Qual transtorno?</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="transtorno_desc" class="req-field" placeholder="Exemplo: Conduta, Hiperatividade por déficit de atenção, oposição desafiante, etc."></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Faz uso de medicação para este transtorno?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="med_transtorno" value="Não" checked onclick="toggleBox('med_transtorno_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="med_transtorno" value="Sim" onclick="toggleBox('med_transtorno_cite', true)"> Sim</label>
-              </div>
-              <div id="med_transtorno_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="med_transtorno_desc">Qual medicação?</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="med_transtorno_desc" class="req-field" placeholder="Qual?"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Faz acompanhamento com psicólogo?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="psicologo" value="Não" checked onclick="toggleBox('psicologo_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="psicologo" value="Sim" onclick="toggleBox('psicologo_cite', true)"> Sim</label>
-              </div>
-              <div id="psicologo_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="psicologo_desc">Contato / Profissional</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="psicologo_desc" class="req-field" placeholder="Qual?"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Faz acompanhamento com médico?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="medico_mental" value="Não" checked onclick="toggleBox('medico_mental_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="medico_mental" value="Sim" onclick="toggleBox('medico_mental_cite', true)"> Sim</label>
-              </div>
-              <div id="medico_mental_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="medico_mental_desc">Contato</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="medico_mental_desc" class="req-field" placeholder="Contato"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Faz acompanhamento com outro profissional?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="outro_prof" value="Não" checked onclick="toggleBox('outro_prof_cite', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="outro_prof" value="Sim" onclick="toggleBox('outro_prof_cite', true)"> Sim</label>
-              </div>
-              <div id="outro_prof_cite" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="outro_prof_desc">Contato</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="outro_prof_desc" class="req-field" placeholder="Contato"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </fieldset>
-
-        <!-- 9. Deficiências -->
-        <fieldset>
-          <legend>Deficiências</legend>
-          <div class="form-group" style="max-width: 200px; margin-bottom: 8px;">
-            <label for="deficiencia_opt">Possui deficiência?</label>
-            <div class="req-field-container">
-              <span class="req-dot"></span>
-              <select id="deficiencia_opt" class="req-field" required onchange="toggleBox('deficiencia_box', this.value === 'Sim')">
-                <option value="Não">Não</option>
-                <option value="Sim">Sim</option>
-              </select>
-            </div>
-          </div>
-
-          <div id="deficiencia_box" class="conditional-box hidden">
-            <div style="display:flex; flex-direction:column; gap:8px;">
-              <div style="display:flex; gap:10px; align-items:center;"><label style="width:120px;" class="checkbox-group"><input type="checkbox" id="def_fisica"> Física</label><input type="text" id="def_fisica_desc" placeholder="Especificar"></div>
-              <div style="display:flex; gap:10px; align-items:center;"><label style="width:120px;" class="checkbox-group"><input type="checkbox" id="def_visual"> Visual</label><input type="text" id="def_visual_desc" placeholder="Especificar"></div>
-              <div style="display:flex; gap:10px; align-items:center;"><label style="width:120px;" class="checkbox-group"><input type="checkbox" id="def_auditiva"> Auditiva</label><input type="text" id="def_auditiva_desc" placeholder="Especificar"></div>
-              <div style="display:flex; gap:10px; align-items:center;"><label style="width:120px;" class="checkbox-group"><input type="checkbox" id="def_intelectual"> Intelectual</label><input type="text" id="def_intelectual_desc" placeholder="Especificar"></div>
-              <div style="display:flex; gap:10px; align-items:center;"><label style="width:120px;" class="checkbox-group"><input type="checkbox" id="def_autismo"> Autismo</label><input type="text" id="def_autismo_desc" placeholder="Especificar"></div>
-            </div>
-            <p style="font-size:0.75rem; color:#777; margin-top:8px;">*(equiparado às deficiências pela Lei 12.764 de 2012)*</p>
-          </div>
-        </fieldset>
-
-        <!-- 10. Apresenta no Comportamento -->
-        <fieldset>
-          <legend>Apresenta no comportamento</legend>
-          <div style="display:flex; flex-direction:column; gap:12px;">
-
-            <div>
-              <label style="font-size:0.85rem;">Crises de explosão em que agrida a si mesmo?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_agride_si" value="Não" checked onclick="toggleBox('comp_agride_si_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_agride_si" value="Sim" onclick="toggleBox('comp_agride_si_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_agride_si_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_agride_si_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_agride_si_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Crises de explosão em que agrida os outros?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_agride_outros" value="Não" checked onclick="toggleBox('comp_agride_outros_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_agride_outros" value="Sim" onclick="toggleBox('comp_agride_outros_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_agride_outros_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_agride_outros_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_agride_outros_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Agitação psicomotora que atrapalhe a concentração?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_agitacao" value="Não" checked onclick="toggleBox('comp_agitacao_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_agitacao" value="Sim" onclick="toggleBox('comp_agitacao_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_agitacao_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_agitacao_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_agitacao_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Dificuldade de obedecer instruções verbais? De que tipo?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_instrucao" value="Não" checked onclick="toggleBox('comp_instrucao_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_instrucao" value="Sim" onclick="toggleBox('comp_instrucao_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_instrucao_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_instrucao_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_instrucao_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Tendência a fugas?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_fugas" value="Não" checked onclick="toggleBox('comp_fugas_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_fugas" value="Sim" onclick="toggleBox('comp_fugas_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_fugas_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_fugas_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_fugas_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Comportamento auto-destrutivo (cortes, arranhões, etc.)?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_autodestruicao" value="Não" checked onclick="toggleBox('comp_autodestruicao_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_autodestruicao" value="Sim" onclick="toggleBox('comp_autodestruicao_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_autodestruicao_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_autodestruicao_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_autodestruicao_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Crises de ansiedade ou pânico?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_ansiedade" value="Não" checked onclick="toggleBox('comp_ansiedade_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_ansiedade" value="Sim" onclick="toggleBox('comp_ansiedade_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_ansiedade_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_ansiedade_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_ansiedade_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Dificuldade de comunicação com outras pessoas?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_comunicacao" value="Não" checked onclick="toggleBox('comp_comunicacao_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_comunicacao" value="Sim" onclick="toggleBox('comp_comunicacao_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_comunicacao_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_comunicacao_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_comunicacao_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Dificuldades alimentares?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_alimentar" value="Não" checked onclick="toggleBox('comp_alimentar_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_alimentar" value="Sim" onclick="toggleBox('comp_alimentar_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_alimentar_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_alimentar_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_alimentar_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label style="font-size:0.85rem;">Dificuldades de sono?</label>
-              <div style="display:flex; gap:15px;">
-                <label class="radio-group"><input type="radio" name="comp_sono" value="Não" checked onclick="toggleBox('comp_sono_obs', false)"> Não</label>
-                <label class="radio-group"><input type="radio" name="comp_sono" value="Sim" onclick="toggleBox('comp_sono_obs', true)"> Sim</label>
-              </div>
-              <div id="comp_sono_obs" class="hidden" style="margin-top:4px;">
-                <div class="form-group">
-                  <label for="comp_sono_desc">Observações</label>
-                  <div class="req-field-container"><span class="req-dot"></span><input type="text" id="comp_sono_desc" class="req-field" placeholder="Observações"></div>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </fieldset>
-
-        <!-- 11. Observações Gerais -->
-        <fieldset>
-          <legend>Observações Gerais</legend>
+    <div class="section-box">
+      <div class="section-title">Dados do Cliente</div>
+      
+      <!-- GERENCIAMENTO E IMPORTAÇÃO DE CLIENTES -->
+      <div id="select-cliente-wrapper" style="margin-bottom: 12px;">
+        <div class="grid-2">
           <div class="form-group">
-            <label for="med_obs">Outras informações relevantes</label>
-            <textarea id="med_obs" rows="4" placeholder="Anote aqui qualquer outra informação relevante sobre o associado..."></textarea>
-          </div>
-        </fieldset>
-
-        <!-- TERMO DE AUTORIZAÇÃO E DECLARAÇÃO OBRIGATÓRIO -->
-        <fieldset>
-          <legend>Termos de Autorização e Declaração *</legend>
-          <div style="max-height: 160px; overflow-y: auto; padding: 12px; border: 1px solid var(--border-color); background: #fdfdfd; font-size: 0.82rem; margin-bottom: 12px; line-height: 1.5; text-align: justify; border-radius: 4px;">
-            <p style="text-align: justify; margin-bottom: 8px;">
-              Autorizo o <strong>GRUPO ESCOTEIRO MEMORIAL 350 (GEM) (CNPJ 46.612.339/0001-40)</strong> e a União dos Escoteiros do Brasil (UEB) a utilizarem, a título gratuito, a imagem e a voz minhas e/ou do meu representado em fotografias, vídeos e divulgações de caráter institucional, educativo ou promocional em qualquer meio de comunicação.
-              Declaro conhecer e cumprir as normas internas do GEM 350 e da UEB, bem como atesto a inteira veracidade das informações prestadas neste formulário, sob minha total responsabilidade, em especial os dados da ficha médica.
-            </p>
-          </div>
-
-          <div class="checkbox-group">
-            <input type="checkbox" id="termo_aceite" required style="width: 18px; height: 18px; cursor: pointer;">
-            <label for="termo_aceite" style="font-weight: bold; color: var(--primary-color); cursor: pointer; font-size: 0.88rem;">
-              Li, aceito e concordo com os termos de autorização e declarações acima. *
-            </label>
-          </div>
-        </fieldset>
-
-        <!-- ASSINATURA OBRIGATÓRIA -->
-        <fieldset>
-          <legend>Assinatura Digital Responsável / Associado *</legend>
-          <div class="signature-area">
-            <p style="font-size: 0.85rem; color: #555; margin-bottom: 8px;">Desenhe sua assinatura no quadro abaixo:</p>
-            <canvas id="signature-canvas" width="450" height="150"></canvas>
-            <div style="margin-top: 8px;">
-              <button type="button" class="btn-action" onclick="limparAssinatura()">Limpar Assinatura</button>
+            <label>Selecione um Cliente Salvo:</label>
+            <div style="display: flex; gap: 6px;">
+              <select id="select-cliente" onchange="carregarCliente(this.value)">
+                <option value="">-- Carregando Clientes... --</option>
+              </select>
+              <button type="button" class="btn-remove" title="Excluir Cliente Selecionado" onclick="excluirClienteSelecionado()">🗑️</button>
             </div>
           </div>
-        </fieldset>
+          <div class="form-group" style="justify-content: flex-end;">
+            <button type="button" id="btn-salvar-cliente" class="btn-add" onclick="salvarNovoCliente()">Salvar na Agenda Local</button>
+          </div>
+        </div>
 
-        <!-- BOTÕES FINAIS -->
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" onclick="forcarMudancaAba('responsaveis')">🠔 Voltar: Responsáveis</button>
-          <button type="button" class="btn btn-primary" onclick="executarAcao('salvar')">Salvar PDF</button>
-          <button type="button" class="btn btn-secondary" onclick="executarAcao('compartilhar')">Compartilhar PDF</button>
-          <button type="button" class="btn btn-outline" onclick="executarAcao('imprimir')">Imprimir PDF</button>
-          <button type="button" class="btn btn-danger" onclick="limparDados()">Limpar Dados</button>
+        <div class="grid-2" style="margin-top: 10px;">
+          <button type="button" class="btn-action" style="background-color: #17a2b8; color: white;" onclick="importarContatosAgenda()">📱 Importar da Agenda do Celular</button>
+          <button type="button" class="btn-action" style="background-color: #6c757d; color: white;" onclick="triggerImportarArquivo()">📂 Importar de Arquivo (JSON/CSV)</button>
+          <input type="file" id="input-arquivo-cliente" accept=".json,.csv" style="display: none;" onchange="importarArquivoCliente(event)">
         </div>
       </div>
 
-    </form>
-  </main>
+      <div class="grid-2">
+        <div class="form-group"><label>Referência:</label><input type="text" id="cli-referencia"></div>
+        <div class="form-group"><label>Nome Completo:</label><input type="text" id="cli-nome"></div>
+        <div class="form-group"><label>E-mail:</label><input type="email" id="cli-email" placeholder="cliente@exemplo.com"></div>
+        <div class="form-group"><label>Telefone / WhatsApp:</label><input type="text" id="cli-telefone"></div>
+        <div class="form-group"><label>CPF:</label><input type="text" id="cli-cpf"></div>
+        <div class="form-group"><label>RG:</label><input type="text" id="cli-rg"></div>
+        <div class="form-group full-width"><label>Endereço Completo:</label><input type="text" id="cli-endereco"></div>
+      </div>
+    </div>
 
-  <!-- RODAPÉ -->
-  <footer style="background-color: var(--primary-color); color: #dddddd; padding: 25px 20px; border-top: 4px solid var(--secondary-color); font-size: 0.9rem; text-align: center; width: 100%; margin-top: 40px;">
-    <div style="max-width: 700px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 12px;">
-      <img src="https://i.ibb.co/CKWP9CmS/logo-GE-M-2025.jpg" alt="Logo Grupo Escoteiro Memorial 350 SP" style="width: 60px; height: 60px; object-fit: contain; border-radius: 50%;">
-      <div>
-        <p style="margin-bottom: 5px; line-height: 1.4;"><strong>Grupo Escoteiro Memorial 350 SP</strong></p>
-        <p style="margin-bottom: 5px; line-height: 1.4;">Av. Doutor Altair Martins, 520 - Raposo Tavares, Osasco - SP, 06149-020</p>
+    <details open>
+      <summary>Informações básicas</summary>
+      <div class="grid-2">
+        <div class="form-group"><label>Validade do orçamento:</label><input type="text" id="info-validade" placeholder="Ex: 10 dias"></div>
+        <div class="form-group"><label>Marca:</label><input type="text" id="info-marca"></div>
+        <div class="form-group"><label>Modelo:</label><input type="text" id="info-modelo"></div>
+        <div class="form-group"><label>Tipo de Aparelho:</label><input type="text" id="info-aparelho"></div>
+        <div class="form-group"><label>Tipo de Equipamento:</label><input type="text" id="info-equipamento"></div>
+        <div class="form-group"><label>Outros:</label><input type="text" id="info-outros"></div>
+
+        <div class="form-group full-width">
+          <label>Acessórios Deixados:</label>
+          <textarea id="info-acessorios" rows="3"></textarea>
+          <div id="print-info-acessorios" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Defeito Reclamado:</label>
+          <textarea id="info-defeito" rows="5"></textarea>
+          <div id="print-info-defeito" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Observações:</label>
+          <textarea id="info-obs" rows="5"></textarea>
+          <div id="print-info-obs" class="print-text-display"></div>
+        </div>
       </div>
-      <div>
-        <a href="https://www.instagram.com/gememorial?igsh=Z2dycGZ5bDVqdmw1" target="_blank" style="color: var(--secondary-color); text-decoration: none; font-weight: bold;">Siga-nos no Instagram: @gememorial</a>
+    </details>
+
+    <details open>
+      <summary>Detalhes do Pedido (Itens e Serviços)</summary>
+      <div class="form-group" style="margin-bottom: 12px;">
+        <label>Valor Visita Técnica (R$):</label>
+        <input type="text" id="val-visita" value="0,00" oninput="calcularTotais()">
       </div>
+
+      <div class="section-title">Peças / Componentes</div>
+      <div id="container-pecas"></div>
+      <button type="button" class="btn-add" onclick="adicionarPeca()">+ Adicionar Peça</button>
+
+      <div class="section-title" style="margin-top: 15px;">Serviços Executados</div>
+      <div id="container-servicos"></div>
+      <button type="button" class="btn-add" onclick="adicionarServico()">+ Adicionar Serviço</button>
+
+      <div class="form-group" style="margin-top: 15px;">
+        <label>Subtotal Geral (Peças + Serviços + Visita):</label>
+        <input type="text" id="subtotal-geral" readonly style="font-weight: bold;">
+      </div>
+    </details>
+
+    <details open>
+      <summary>Desconto</summary>
+      <div class="grid-3">
+        <div class="form-group"><label>Desconto Visita (R$):</label><input type="text" id="desc-visita" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Desconto Peças (R$):</label><input type="text" id="desc-pecas" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Desconto Serviços (R$):</label><input type="text" id="desc-servicos" value="0,00" oninput="calcularTotais()"></div>
+      </div>
+      <div class="form-group" style="margin-top: 10px;">
+        <label>Total de Descontos Subtraídos (R$):</label>
+        <input type="text" id="total-desconto" readonly style="color: #ff4444; font-weight: bold;">
+      </div>
+    </details>
+
+    <details open>
+      <summary>Taxas Adicionais</summary>
+      <div class="grid-2">
+        <div class="form-group"><label>Valor Taxa de Entrega (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Valor do Frete (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
+        <div class="form-group"><label>Outras Taxas (R$):</label><input type="text" class="input-taxa" value="0,00" oninput="calcularTotais()"></div>
+      </div>
+      <div class="form-group" style="margin-top: 10px;">
+        <label>Total de Taxas Adicionadas (R$):</label>
+        <input type="text" id="total-taxas" readonly style="font-weight: bold;">
+      </div>
+    </details>
+
+    <div class="section-box" style="border: 2px solid var(--accent-orange);">
+      <div class="form-group">
+        <label style="font-size: 1.1rem; color: var(--accent-orange); font-weight: bold;">VALOR TOTAL LIQUIDO DO PEDIDO (R$):</label>
+        <input type="text" id="valor-total-final" readonly style="font-size: 1.4rem; font-weight: bold; color: var(--accent-orange);">
+      </div>
+    </div>
+
+    <details open>
+      <summary>Opções de Pagamento</summary>
+      <div class="grid-3">
+        <div class="form-group"><label>À vista (R$):</label><input type="text" id="pag-vista"></div>
+        <div class="form-group"><label>Sinal / Entrada (R$):</label><input type="text" id="pag-sinal"></div>
+        <div class="form-group"><label>Parcelamento / Detalhes:</label><input type="text" id="pag-parcelas" placeholder="Ex: 3x de R$ 120,00"></div>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Meios de Pagamento (Múltipla escolha)</summary>
+      <div class="checkbox-group">
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Transferência bancária"> Transferência bancária</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Dinheiro"> Dinheiro</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Cheque"> Cheque</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Cartão de crédito"> Cartão de crédito</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Cartão de débito"> Cartão de débito</label>
+        <label class="checkbox-item"><input type="checkbox" class="meio-pag" value="Pix"> Pix</label>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Informações adicionais</summary>
+      <div class="grid-2">
+        <div class="form-group full-width"><label>Garantia:</label><input type="text" id="add-garantia" value="90 dias conforme termo"></div>
+
+        <div class="form-group full-width">
+          <label>Anotações:</label>
+          <textarea id="add-anotacoes" rows="5"></textarea>
+          <div id="print-add-anotacoes" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Relatório Técnico:</label>
+          <textarea id="add-relatorio" rows="5"></textarea>
+          <div id="print-add-relatorio" class="print-text-display"></div>
+        </div>
+
+        <div class="form-group full-width">
+          <label>Observações Adicionais:</label>
+          <textarea id="add-obs" rows="5"></textarea>
+          <div id="print-add-obs" class="print-text-display"></div>
+        </div>
+      </div>
+    </details>
+
+    <details open>
+      <summary>CONDIÇÕES DE PRESTAÇÃO DE SERVIÇOS</summary>
+      <div class="terms-box">
+        <h4>1. Diagnóstico e defeito informado</h4>
+        <p>O defeito informado pelo cliente será registrado na ordem de serviço. Contudo, o diagnóstico definitivo somente será confirmado após a abertura e análise técnica do equipamento.</p>
+        <h4>2. Prazo de execução</h4>
+        <p>O prazo de execução dos serviços varia de acordo com a complexidade do trabalho, podendo ser de até 5 dias úteis.</p>
+        <h4>3. Garantia</h4>
+        <p>É concedida garantia de 90 dias sobre as peças substituídas e sobre a mão de obra executada.</p>
+        <h4>4. Licenciamento de software</h4>
+        <p>A instalação de sistemas é realizada exclusivamente de forma legal.</p>
+        <h4>5. Formas de pagamento</h4>
+        <p>Pagamento à vista, dinheiro, Pix ou cartão de crédito.</p>
+        <h4>6. Lacre de garantia</h4>
+        <p>A remoção do lacre implica na perda imediata da garantia.</p>
+        <h4>7. Declaração do cliente</h4>
+        <p>Declaro estar de acordo com todas as condições acima.</p>
+      </div>
+
+      <div class="signature-area">
+        <div class="signature-grid">
+          <div>
+            <label style="color:#000; font-weight:bold;">DATA:</label>
+            <input type="text" id="data-assinatura" style="text-align:center;">
+          </div>
+          <div><div class="signature-line">CLIENTE</div></div>
+        </div>
+      </div>
+    </details>
+
+    <div class="action-buttons">
+      <button type="button" class="btn-action btn-save" onclick="salvarPedidoHistorico()">SALVAR PEDIDO</button>
+      <button type="button" class="btn-action btn-print" onclick="imprimirOS()">GERAR ORÇAMENTO / ORDEM DE SERVIÇO</button>
+      <button type="button" class="btn-action btn-share" onclick="compartilharWhatsAppOS()">COMPARTILHAR WHATSAPP</button>
+      <button type="button" class="btn-action btn-clear" onclick="limparFormularioComConfirmacao()">LIMPAR DADOS</button>
+    </div>
+
+  </div>
+
+  <!-- ABA 2: GERAR DOCUMENTOS E RECIBOS -->
+  <div id="emitir-documentos" class="tab-content">
+    <div class="section-box" id="emitir-documentos-form">
+      <div class="section-title">Gerador de Documentos e Baixa de Recibos</div>
+      
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Selecione o Pedido Salvo:</label>
+          <select id="select-pedido-recibo" onchange="carregarDadosPedidoRecibo(this.value)">
+            <option value="">-- Carregando Pedidos... --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Cliente:</label>
+          <input type="text" id="recibo-cliente" readonly>
+        </div>
+        <div class="form-group">
+          <label>Valor Total Líquido do Pedido (R$):</label>
+          <input type="text" id="recibo-val-total" readonly style="font-weight: bold;">
+        </div>
+        <div class="form-group">
+          <label>Saldo Restante / Em Aberto (R$):</label>
+          <input type="text" id="recibo-saldo-devedor" readonly style="color: #ff4444; font-weight: bold;">
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 15px;">
+        <div class="form-group">
+          <label>Valor do Pagamento / Baixa Atual (R$):</label>
+          <input type="text" id="recibo-val-pagamento" placeholder="0,00">
+        </div>
+        <div class="form-group">
+          <label>Forma do Pagamento:</label>
+          <select id="recibo-forma-pagamento">
+            <option>Pix</option>
+            <option>Dinheiro</option>
+            <option>Cartão de Crédito</option>
+            <option>Cartão de Débito</option>
+            <option>Transferência Bancária</option>
+            <option>Cheque</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="button" class="btn-add" style="margin-top: 15px; width: 100%; padding: 12px;" onclick="darBaixaPagamento()">Registrar Baixa de Pagamento</button>
+
+      <div class="section-title" style="margin-top: 25px;">Gerar e Imprimir Documento Oficial</div>
+
+      <div class="action-buttons">
+        <button type="button" class="btn-action btn-print" onclick="imprimirRecibo()">1. GERAR RECIBO DE PAGAMENTO</button>
+        <button type="button" class="btn-action btn-share" style="background-color: #ff7700; color:#000;" onclick="imprimirNotaServico()">2. GERAR NOTA DE PRESTAÇÃO DE SERVIÇOS</button>
+      </div>
+
+      <div class="action-buttons">
+        <button type="button" class="btn-action btn-share" onclick="compartilharWhatsAppRecibo()">COMPARTILHAR RECIBO WHATSAPP</button>
+      </div>
+
+      <button type="button" class="btn-delete" onclick="excluirPedidoSalvo()">🗑️ EXCLUIR ESTE PEDIDO SALVO</button>
+    </div>
+
+    <!-- TEMPLATE 1: IMPRESSÃO DE RECIBO -->
+    <div id="recibo-print-template" class="section-box">
+      <h2 style="text-align:center; color:#000; margin-bottom:15px;">RECIBO DE PAGAMENTO</h2>
+      <p style="font-size:1.1rem; line-height:1.6; color:#000;">
+        Recebi(emos) de <strong id="recibo-p-cliente">____________________</strong> a quantia de 
+        <strong id="recibo-p-valor">R$ 0,00</strong> referente ao pagamento/baixa da Ordem de Serviço nº 
+        <strong id="recibo-p-num">______</strong>.
+      </p>
+      <br>
+      <p style="font-size:1rem; color:#000;"><strong>Saldo Restante do Pedido:</strong> <span id="recibo-p-saldo">R$ 0,00</span></p>
+      <br>
+      <div class="signature-grid" style="margin-top:40px;">
+        <div>
+          <label style="color:#000; font-weight:bold;">DATA:</label>
+          <p id="recibo-p-data" style="font-weight:bold; color:#000;"></p>
+        </div>
+        <div><div class="signature-line">DONZAMB@ - SOLUÇÕES TÉCNICAS</div></div>
+      </div>
+    </div>
+
+    <!-- TEMPLATE 2: NOTA DE PRESTAÇÃO DE SERVIÇOS -->
+    <div id="nota-servico-print-template" class="section-box">
+      <h2 style="text-align:center; color:#000; margin-bottom:12px;">NOTA DE PRESTAÇÃO DE SERVIÇOS</h2>
+      <div id="nota-detalhes-conteudo" style="font-size: 0.85rem; color:#000; line-height: 1.4;"></div>
+      
+      <div class="signature-grid">
+        <div>
+          <div class="signature-line">ASSINATURA TÉCNICO (DONZAMB@)</div>
+        </div>
+        <div>
+          <div class="signature-line">ASSINATURA DO CLIENTE</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-box">
+      <div class="section-title">Histórico de Baixas do Pedido</div>
+      <div id="historico-pagamentos">
+        <p style="color: var(--text-muted);">Nenhum pedido selecionado.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-info">
+      📍 <strong>Endereço:</strong> Rua Aristides Bellini 471, Pestana, Osasco, SP 06114-150<br>
+      ✉️ <strong>E-mail:</strong> donzamb@yahoo.com.br<br>
+      🔗 <strong>Acesse / Avalie:</strong> <a href="https://g.page/r/CY27wpqOvKuEEBM/review" target="_blank">Clique para avaliar no Google</a>
+    </div>
+    <div>
+      <img src="qrcode.png" alt="QR Code Avaliação" class="qr-code-img" onerror="this.alt='[QR Code Google Review]'">
     </div>
   </footer>
 
-  <!-- JAVASCRIPT -->
   <script>
-    const LISTA_ESCOLARIDADE = [
-      "Não informado",
-      "Ensino fundamental incompleto",
-      "Ensino fundamental completo",
-      "Ensino médio incompleto",
-      "Ensino médio completo",
-      "Ensino superior incompleto",
-      "Ensino superior completo",
-      "Especialização incompleta",
-      "Especialização completa",
-      "Mestrado incompleto",
-      "Mestrado completo",
-      "Doutorado incompleto",
-      "Doutorado completo"
-    ];
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpjKpnYfgJ2tDDNpid7xFv2dxWN0oGKz-xAyF943jupSMiQeVejGmaR7zeUAmveMxF/exec";
 
-    const LISTA_PROFISSOES = [
-      "Estudante", "Outras Profissões", "Açougueiro(a)", "Administrador(a)", "Advogado(a)", "Aeronauta",
-      "Aeroviário(a)", "Afiador(a)", "Agenciador(a)", "Agente", "Agricultor(a)", "Agrimensor(a)",
-      "Agrônomo(a)", "Agropecuarista", "Ajudante", "Ajustador(a)", "Alfaiate", "Almoxarife", "Analista",
-      "Antropólogo(a)", "Apicultor(a)", "Aposentado(a)", "Apresentador(a)", "Árbitro(a)", "Arqueólogo(a)",
-      "Arquiteto(a)", "Arquivista", "Artesão(ã)", "Artista", "Ascensorista", "Assessor(a)", "Assistente",
-      "Astrônomo(a)", "Atendente", "Atleta", "Ator/atriz", "Auditor(a)", "Autônomo(a)", "Auxiliar",
-      "Avaliador(a)", "Avicultor(a)", "Baba", "Bailarino(a)", "Balconista", "Bancário(a)", "Barbeiro(a)",
-      "Barman", "Bibliotecário(a)", "Bilheteiro(a)", "Biólogo(a)", "Biomédico(a)", "Bioquímico(a)",
-      "Bloquista", "Bombeiro(a)", "Bordador(a)", "Borracheiro(a)", "Cabeleireiro(a)", "Caixa",
-      "Camareiro(a)", "Caminhoneiro(a)", "Cantor(a)", "Carpinteiro(a)", "Carregador(a)", "Carroceiro(a)",
-      "Carteiro(a)", "Cartorário(a)", "Carvoeiro(a)", "Caseiro(a)", "Cenógrafo(a)", "Ceramista",
-      "Chapeador(a)", "Chapeleiro(a)", "Chapista", "Chaveiro(a)", "Chefe", "Cientista", "Cineasta",
-      "Cinegrafista", "Classificador(a)", "Cobrador(a)", "Coletor(a)", "Comandante", "Comerciante",
-      "Comerciário(a)", "Comissário(a)", "Compositor(a)", "Comunicador(a)", "Condutor(a)", "Confeiteiro(a)",
-      "Conferente", "Construtor(a)", "Consultor(a)", "Contador(a)", "Controlador(a)", "Coordenador(a)",
-      "Copeiro(a)", "Coreógrafo(a)", "Corretor(a)", "Cortador(a)", "Costureiro(a)", "Cozinheiro(a)",
-      "Criador(a)", "Cuidador(a)", "Dançarino(a)", "Decorador(a)", "Delegado(a)", "Dentista",
-      "Desempregado(a)", "Desenhista", "Desenvolvedor(a)", "Designer", "Despachante", "Detetive",
-      "Diagramador(a)", "Diarista", "Digitador(a)", "Diretor(a)", "Distribuidor(a)", "DJ", "Do lar",
-      "Doceiro(a)", "Doméstico(a)", "Economista", "Editor(a)", "Educador(a)", "Eletricista",
-      "Eletricitário(a)", "Eletrotecnico(a)", "Embalador(a)", "Empacotador(a)", "Empreiteiro(a)",
-      "Empresário(a)", "Encaixotador(a)", "Encanador(a)", "Encarregado(a)", "Enfermeiro(a)", "Engenheiro(a)",
-      "Entregador(a)", "Escrevente", "Escritor(a)", "Escriturário(a)", "Escrivão(ã)", "Estagiário(a)",
-      "Estatístico(a)", "Esteticista", "Estilista", "Estofador(a)", "Executivo(a)", "Farmacêutico(a)",
-      "Faxineiro(a)", "Fazendeiro(a)", "Feirante", "Ferroviário(a)", "Filósofo(a)", "Fiscal", "Físico(a)",
-      "Fisioterapeuta", "Floricultor(a)", "Fonoaudiólogo(a)", "Fotógrafo(a)", "Frentista",
-      "Funcionário(a) público(a)", "Fundidor(a)", "Funileiro(a)", "Garagista", "Garçom/garçonete", "Gari",
-      "Garimpeiro(a)", "Geneticista", "Geofísico(a)", "Geógrafo(a)", "Geologista", "Geólogo(a)", "Gerente",
-      "Gesseiro(a)", "Governador(a)", "Governanta", "Gravador(a)", "Guarda", "Guia de turismo",
-      "Historiador(a)", "Impressor(a)", "Industriário(a)", "Inspetor(a)", "Instalador(a)", "Instrumentador(a)",
-      "Instrumentista", "Instrutor(a)", "Jardineiro(a)", "Joalheiro(a)", "Jóquei", "Jornaleiro(a)",
-      "Jornalista", "Juiz(a)", "Jurista", "Lapidário(a)", "Lavador(a)", "Lavrador(a)", "Leiloeiro(a)",
-      "Leiturista", "Locutor(a)", "Lustrador(a)", "Manicure", "Maquetista", "Maquiador(a)", "Maquinista",
-      "Marceneiro(a)", "Marinheiro(a)", "Marketing", "Massagista", "Massoterapeuta", "Matemático(a)",
-      "Mecânico(a)", "Medico(a)", "Mensageiro(a)", "Mestre", "Metalúrgico(a)", "Meteorologista", "Militar",
-      "Mineiro(a)", "Ministro(a)", "Modelista", "Modelo", "Moldador(a)", "Monitor(a)", "Montador(a)",
-      "Mordomo", "Moto boy", "Motorista", "Mototaxista", "Museólogo(a)", "Músico/Musicista", "Nutricionista",
-      "Oceanógrafo(a)", "Odontologo(a)", "Office boy", "Oficial", "Oleiro(a)", "Operador(a)", "Operário(a)",
-      "Orientador(a)", "Ourives", "Padeiro(a)", "Peão", "Pecuarista", "Pedagogo(a)", "Pedreiro(a)",
-      "Perito(a)", "Pescador(a)", "Pesquisador(a)", "Piloto(a)", "Pintor(a)", "Pizzaiolo(a)", "Policial",
-      "Polidor(a)", "Político", "Porteiro(a)", "Prefeito(a)", "Procurador(a)", "Produtor(a) cultural",
-      "Produtor(a) rural", "Professor(a)", "Programador(a)", "Projetista", "Promotor(a)", "Psicanalista",
-      "Psicólogo(a)", "Publicitário(a)", "Químico(a)", "Radialista", "Recepcionista", "Redator(a)",
-      "Relações públicas", "Religioso(a)", "Relojoeiro(a)", "Repórter", "Repositor(a)", "Representante",
-      "Revisor(a)", "Salgadeiro(a)", "Salva vidas", "Sapateiro(a)", "Secretario(a)", "Segurança",
-      "Serigrafista", "Seringueiro(a)", "Serralheiro(a)", "Servente", "Sociólogo(a)", "Supervisor(a)",
-      "Tabelião(ã)", "Taxista", "Tecelão(ã)", "Técnico(a)", "Técnico(a) Judiciário", "Tecnólogo(a)",
-      "Telefonista", "Terapeuta", "Tesoureiro(a)", "Topógrafo(a)", "Torneiro(a)", "Tradutor(a)",
-      "Treinador(a)", "Turismo", "Vendedor(a)", "Veterinário(a)", "Vidraceiro(a)", "Vigia", "Vigilante",
-      "Vistoriador(a)", "Zelador(a)", "Zootecnista"
-    ];
+    let clientesGlobais = [];
+    let pedidosGlobais = [];
 
-    const UFS_BRASIL = [
-      "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG",
-      "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
-    ];
+    function parseMoeda(v) {
+      if (!v) return 0;
+      let s = String(v).replace('R$', '').trim();
+      if (s.includes(',')) {
+        s = s.replace(/\./g, '').replace(',', '.');
+      }
+      return parseFloat(s) || 0;
+    }
 
-    const DENOMINACOES = {
-      "Católica": ["Católica Romana", "Católica Ortodoxa", "Outra"],
-      "Evangélica": ["Assembleia de Deus", "Batista", "Presbiteriana", "Luterana", "Adventista", "Metodista", "Outra"],
-      "Espírita": ["Kardecista", "Outra"],
-      "Matriz Africana": ["Candomblé", "Umbanda", "Outra"]
+    function formatarMoeda(v) {
+      let num = parseFloat(v) || 0;
+      return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function prepararTextosParaImpressao() {
+      const ids = [
+        ['info-acessorios', 'print-info-acessorios'],
+        ['info-defeito', 'print-info-defeito'],
+        ['info-obs', 'print-info-obs'],
+        ['add-anotacoes', 'print-add-anotacoes'],
+        ['add-relatorio', 'print-add-relatorio'],
+        ['add-obs', 'print-add-obs']
+      ];
+
+      ids.forEach(([textareaId, printDivId]) => {
+        const txt = document.getElementById(textareaId);
+        const div = document.getElementById(printDivId);
+        if (txt && div) {
+          div.textContent = txt.value.trim() !== '' ? txt.value : '---';
+        }
+      });
+    }
+
+    function openTab(tabId) {
+      document.getElementById('ordem-servico').classList.remove('active');
+      document.getElementById('emitir-documentos').classList.remove('active');
+      document.getElementById('btn-tab-os').classList.remove('active');
+      document.getElementById('btn-tab-docs').classList.remove('active');
+
+      if (tabId === 'ordem-servico') {
+        document.getElementById('ordem-servico').classList.add('active');
+        document.getElementById('btn-tab-os').classList.add('active');
+      } else {
+        document.getElementById('emitir-documentos').classList.add('active');
+        document.getElementById('btn-tab-docs').classList.add('active');
+      }
+    }
+
+    function gerarProximoNumeroNovoPedido() {
+      const hoje = new Date();
+      let nAtual = localStorage.getItem('donzamb_num_pedido') || 1;
+      return String(nAtual).padStart(3, '0') + '-' + hoje.getFullYear();
+    }
+
+    window.onload = function() {
+      const hoje = new Date();
+      const dStr = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear();
+      document.getElementById('data-pedido').value = dStr;
+      document.getElementById('data-assinatura').value = dStr;
+
+      document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
+
+      adicionarPeca();
+      adicionarServico();
+      sincronizarComPlanilha();
+      calcularTotais();
     };
 
-    let abaAtual = 'basicas';
-    let canvas, ctx, desenhando = false, assinaturaFeita = false;
+    function sincronizarComPlanilha() {
+      let clientesLocais = JSON.parse(localStorage.getItem('donzamb_clientes') || '[]');
+      let pedidosLocais = JSON.parse(localStorage.getItem('donzamb_pedidos') || '[]');
 
-    document.addEventListener('DOMContentLoaded', () => {
-      povoarSelects();
-      inicializarCanvas();
-      carregarEstadoFormulario();
+      if (clientesLocais.length > 0) clientesGlobais = clientesLocais;
+      if (pedidosLocais.length > 0) pedidosGlobais = pedidosLocais;
 
-      document.getElementById('cadastroForm').addEventListener('input', salvarEstadoFormulario);
-      document.getElementById('cadastroForm').addEventListener('change', salvarEstadoFormulario);
+      atualizarSelectClientes();
+      atualizarSelectPedidosRecibo();
 
-      window.addEventListener('beforeprint', prepararDatasImpressao);
-      window.addEventListener('afterprint', restaurarDatasImpressao);
-
-      const tabsNav = document.getElementById('tabsNav');
-      if (tabsNav) {
-        tabsNav.addEventListener('scroll', verificarScrollAbas);
-      }
-      window.addEventListener('resize', verificarScrollAbas);
-      setTimeout(verificarScrollAbas, 300);
-    });
-
-    function povoarSelects() {
-      ['escolaridade', 'resp1_escolaridade', 'resp2_escolaridade'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          LISTA_ESCOLARIDADE.forEach(item => {
-            const opt = document.createElement('option');
-            opt.value = item;
-            opt.textContent = item;
-            el.appendChild(opt);
-          });
-        }
-      });
-
-      ['profissao', 'resp1_profissao', 'resp2_profissao'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          LISTA_PROFISSOES.forEach(item => {
-            const opt = document.createElement('option');
-            opt.value = item;
-            opt.textContent = item;
-            el.appendChild(opt);
-          });
-        }
-      });
-
-      ['uf_nascimento', 'assoc_uf', 'resp1_uf', 'resp2_uf'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-          UFS_BRASIL.forEach(uf => {
-            const opt = document.createElement('option');
-            opt.value = uf;
-            opt.textContent = uf;
-            if (uf === 'SP') opt.selected = true;
-            el.appendChild(opt);
-          });
-        }
-      });
-    }
-
-    function atualizarDenominacoes() {
-      const rel = document.getElementById('religiao').value;
-      const denSelect = document.getElementById('denominacao');
-      denSelect.innerHTML = '<option value="">Selecione a Denominação</option>';
-
-      if (DENOMINACOES[rel]) {
-        DENOMINACOES[rel].forEach(d => {
-          const opt = document.createElement('option');
-          opt.value = d;
-          opt.textContent = d;
-          denSelect.appendChild(opt);
-        });
-      }
-    }
-
-    function tentarMudarAba(targetAba) {
-      const ordemAbas = ['basicas', 'responsaveis', 'medica'];
-      const indexAtual = ordemAbas.indexOf(abaAtual);
-      const indexTarget = ordemAbas.indexOf(targetAba);
-
-      if (indexTarget > indexAtual) {
-        for (let i = indexAtual; i < indexTarget; i++) {
-          if (!validarAba(ordemAbas[i])) {
-            alert('Por favor, preencha todos os campos obrigatórios da aba atual antes de avançar.');
-            return;
-          }
-        }
-      }
-
-      forcarMudancaAba(targetAba);
-    }
-
-    function forcarMudancaAba(targetAba) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-      document.getElementById('btn-tab-' + targetAba).classList.add('active');
-      document.getElementById('tab-' + targetAba).classList.add('active');
-      abaAtual = targetAba;
-
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(verificarScrollAbas, 100);
-    }
-
-    function verificarScrollAbas() {
-      const nav = document.getElementById('tabsNav');
-      const hint = document.getElementById('tabsScrollHint');
-      if (!nav || !hint) return;
-
-      const temOverflow = nav.scrollWidth > nav.clientWidth + 5;
-      const estaNoFim = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 10;
-
-      if (temOverflow && !estaNoFim) {
-        hint.classList.add('visible');
-      } else {
-        hint.classList.remove('visible');
-      }
-    }
-
-    function scrollTabsRight() {
-      const nav = document.getElementById('tabsNav');
-      if (nav) {
-        nav.scrollBy({ left: 120, behavior: 'smooth' });
-      }
-    }
-
-    function switchSubTab(subTabId) {
-      document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('subtab-resp1').classList.add('hidden');
-      document.getElementById('subtab-resp2').classList.add('hidden');
-
-      document.getElementById('btn-sub-' + subTabId).classList.add('active');
-      document.getElementById('subtab-' + subTabId).classList.remove('hidden');
-    }
-
-    function validarAba(abaId) {
-      const abaEl = document.getElementById('tab-' + abaId);
-      const camposObrigatorios = abaEl.querySelectorAll('[required]');
-      let tudoValido = true;
-
-      camposObrigatorios.forEach(campo => {
-        if (!campo.value.trim()) {
-          campo.classList.add('req-field');
-          tudoValido = false;
-        }
-      });
-
-      return tudoValido;
-    }
-
-    function validarFormularioCompleto() {
-      const ordemAbas = ['basicas', 'responsaveis', 'medica'];
-      for (let aba of ordemAbas) {
-        if (!validarAba(aba)) {
-          forcarMudancaAba(aba);
-          alert('Por favor, preencha todos os campos obrigatórios em destaque.');
-          return false;
-        }
-      }
-
-      const termoAceito = document.getElementById('termo_aceite');
-      if (!termoAceito || !termoAceito.checked) {
-        forcarMudancaAba('medica');
-        alert('É obrigatório marcar a caixinha concordando com os Termos de Autorização e Declaração.');
-        termoAceito.focus();
-        return false;
-      }
-
-      if (!assinaturaFeita) {
-        forcarMudancaAba('medica');
-        alert('É obrigatório realizar a Assinatura Digital na Ficha Médica antes de prosseguir.');
-        return false;
-      }
-
-      return true;
-    }
-
-    function buscarCEP(cep, prefixo) {
-      const cleanCep = cep.replace(/\D/g, '');
-      if (cleanCep.length === 8) {
-        fetch(`https://viacep.com.br/ws/${cleanCep}/json/`)
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+        fetch(`${GOOGLE_SCRIPT_URL}?action=buscarDados`)
           .then(res => res.json())
           .then(data => {
-            if (!data.erro) {
-              if (document.getElementById(prefixo + 'endereco')) document.getElementById(prefixo + 'endereco').value = data.logradouro || '';
-              if (document.getElementById(prefixo + 'bairro')) document.getElementById(prefixo + 'bairro').value = data.bairro || '';
-              if (document.getElementById(prefixo + 'cidade')) document.getElementById(prefixo + 'cidade').value = data.localidade || '';
-              if (document.getElementById(prefixo + 'uf')) document.getElementById(prefixo + 'uf').value = data.uf || '';
-              salvarEstadoFormulario();
+            if (data) {
+              if (data.clientes && data.clientes.length > 0) {
+                data.clientes.forEach(cNuvem => {
+                  let existe = clientesGlobais.some(cLoc => cLoc.nome && cLoc.nome.trim().toLowerCase() === cNuvem.nome.trim().toLowerCase());
+                  if (!existe) clientesGlobais.push(cNuvem);
+                });
+                localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+              }
+
+              if (data.pedidos && data.pedidos.length > 0) {
+                data.pedidos.forEach(pNuvem => {
+                  let existe = pedidosGlobais.some(pLoc => pLoc.num && pLoc.num.trim() === pNuvem.num.trim());
+                  if (!existe) {
+                    pedidosGlobais.push(pNuvem);
+                  } else {
+                    let idx = pedidosGlobais.findIndex(pLoc => pLoc.num && pLoc.num.trim() === pNuvem.num.trim());
+                    if (idx !== -1) pedidosGlobais[idx] = Object.assign({}, pedidosGlobais[idx], pNuvem);
+                  }
+
+                  if (pNuvem.cliente) {
+                    let cExiste = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === pNuvem.cliente.trim().toLowerCase());
+                    if (!cExiste) {
+                      clientesGlobais.push({
+                        ref: pNuvem.ref || '',
+                        nome: pNuvem.cliente,
+                        email: pNuvem.email || '',
+                        tel: pNuvem.tel || '',
+                        cpf: pNuvem.cpf || '',
+                        rg: pNuvem.rg || '',
+                        end: pNuvem.end || ''
+                      });
+                      localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+                    }
+                  }
+                });
+                localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
+              }
             }
+            atualizarSelectClientes();
+            atualizarSelectPedidosRecibo();
+          })
+          .catch(err => {
+            console.log('Sem conexão no momento. Mantendo dados locais:', err);
           });
       }
     }
 
-    function copiarEnderecoAssociado(prefixo) {
-      if (document.getElementById(prefixo + 'cep')) document.getElementById(prefixo + 'cep').value = document.getElementById('assoc_cep').value;
-      if (document.getElementById(prefixo + 'endereco')) document.getElementById(prefixo + 'endereco').value = document.getElementById('assoc_endereco').value;
-      if (document.getElementById(prefixo + 'numero')) document.getElementById(prefixo + 'numero').value = document.getElementById('assoc_numero').value;
-      if (document.getElementById(prefixo + 'complemento')) document.getElementById(prefixo + 'complemento').value = document.getElementById('assoc_complemento').value;
-      if (document.getElementById(prefixo + 'bairro')) document.getElementById(prefixo + 'bairro').value = document.getElementById('assoc_bairro').value;
-      if (document.getElementById(prefixo + 'uf')) document.getElementById(prefixo + 'uf').value = document.getElementById('assoc_uf').value;
-      if (document.getElementById(prefixo + 'cidade')) document.getElementById(prefixo + 'cidade').value = document.getElementById('assoc_cidade').value;
-      salvarEstadoFormulario();
-    }
-
-    function toggleBox(boxId, show) {
-      const box = document.getElementById(boxId);
-      if (show) box.classList.remove('hidden');
-      else box.classList.add('hidden');
-    }
-
-    function adicionarLinhaMedicamento() {
-      const tbody = document.querySelector('#tabelaMedicamentos tbody');
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><input type="text" placeholder="Nome do remédio"></td>
-        <td><select><option value="Sim">Sim</option><option value="Não">Não</option></select></td>
-        <td><input type="text" placeholder="Dosagem / Horários"></td>
+    let countPeca = 0;
+    function adicionarPeca() {
+      countPeca++;
+      const container = document.getElementById('container-pecas');
+      const div = document.createElement('div');
+      div.className = 'dynamic-row';
+      div.id = `peca-row-${countPeca}`;
+      div.innerHTML = `
+        <input type="text" class="peca-desc" placeholder="Descrição Peça ${countPeca}">
+        <input type="number" class="peca-qtd" value="1" min="1" placeholder="Qtd" style="max-width:65px;" oninput="calcularTotais()">
+        <input type="text" class="peca-val" value="0,00" placeholder="Val. Unit" style="max-width:95px;" oninput="calcularTotais()">
+        <input type="text" class="peca-tot" value="0,00" readonly style="max-width:95px;">
+        <button type="button" class="btn-remove" onclick="removerLinha('peca-row-${countPeca}')">X</button>
       `;
-      tbody.appendChild(tr);
+      container.appendChild(div);
+      calcularTotais();
     }
 
-    function inicializarCanvas() {
-      canvas = document.getElementById('signature-canvas');
-      ctx = canvas.getContext('2d');
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = "#000000";
-
-      canvas.addEventListener('mousedown', iniciarDesenho);
-      canvas.addEventListener('mousemove', desenhar);
-      canvas.addEventListener('mouseup', pararDesenho);
-
-      canvas.addEventListener('touchstart', (e) => { e.preventDefault(); iniciarDesenho(e.touches[0]); });
-      canvas.addEventListener('touchmove', (e) => { e.preventDefault(); desenhar(e.touches[0]); });
-      canvas.addEventListener('touchend', pararDesenho);
+    let countServico = 0;
+    function adicionarServico() {
+      countServico++;
+      const container = document.getElementById('container-servicos');
+      const div = document.createElement('div');
+      div.className = 'dynamic-row';
+      div.id = `servico-row-${countServico}`;
+      div.innerHTML = `
+        <span style="font-weight:bold; color:var(--accent-orange);">${String(countServico).padStart(2, '0')}</span>
+        <input type="text" class="serv-desc" placeholder="Descrição Serviço ${countServico}">
+        <input type="text" class="serv-val" value="0,00" placeholder="Val. Unit" style="max-width:105px;" oninput="calcularTotais()">
+        <button type="button" class="btn-remove" onclick="removerLinha('servico-row-${countServico}')">X</button>
+      `;
+      container.appendChild(div);
+      calcularTotais();
     }
 
-    function iniciarDesenho(e) {
-      desenhando = true;
-      const rect = canvas.getBoundingClientRect();
-      ctx.beginPath();
-      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    function removerLinha(id) {
+      const el = document.getElementById(id);
+      if(el) el.remove();
+      calcularTotais();
     }
 
-    function desenhar(e) {
-      if (!desenhando) return;
-      const rect = canvas.getBoundingClientRect();
-      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-      ctx.stroke();
-      assinaturaFeita = true;
-    }
+    function calcularTotais() {
+      let visita = parseMoeda(document.getElementById('val-visita').value);
 
-    function pararDesenho() {
-      desenhando = false;
-      salvarEstadoFormulario();
-    }
-
-    function limparAssinatura() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      assinaturaFeita = false;
-      salvarEstadoFormulario();
-    }
-
-    function salvarEstadoFormulario() {
-      const data = {};
-      const inputs = document.querySelectorAll('#cadastroForm input, #cadastroForm select, #cadastroForm textarea');
-      inputs.forEach(el => {
-        if (el.id) {
-          if (el.type === 'checkbox') data[el.id] = el.checked;
-          else if (el.type === 'radio') {
-            if (el.checked) data[el.name] = el.value;
-          } else data[el.id] = el.value;
-        } else if (el.type === 'radio' && el.checked) {
-          data[el.name] = el.value;
-        }
+      let totalPecas = 0;
+      document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
+        let qtd = parseMoeda(row.querySelector('.peca-qtd').value) || 1;
+        let val = parseMoeda(row.querySelector('.peca-val').value);
+        let sub = qtd * val;
+        row.querySelector('.peca-tot').value = formatarMoeda(sub);
+        totalPecas += sub;
       });
-      if (assinaturaFeita) {
-        data['assinatura_img'] = canvas.toDataURL();
+
+      let totalServicos = 0;
+      document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
+        let val = parseMoeda(row.querySelector('.serv-val').value);
+        totalServicos += val;
+      });
+
+      let subtotal = visita + totalPecas + totalServicos;
+      document.getElementById('subtotal-geral').value = formatarMoeda(subtotal);
+
+      let dVisita = parseMoeda(document.getElementById('desc-visita').value);
+      let dPecas = parseMoeda(document.getElementById('desc-pecas').value);
+      let dServ = parseMoeda(document.getElementById('desc-servicos').value);
+      let totalDesconto = dVisita + dPecas + dServ;
+      document.getElementById('total-desconto').value = formatarMoeda(totalDesconto);
+
+      let totalTaxas = 0;
+      document.querySelectorAll('.input-taxa').forEach(input => {
+        totalTaxas += parseMoeda(input.value);
+      });
+      document.getElementById('total-taxas').value = formatarMoeda(totalTaxas);
+
+      let valorFinal = (subtotal - totalDesconto) + totalTaxas;
+      if (valorFinal < 0) valorFinal = 0;
+      document.getElementById('valor-total-final').value = formatarMoeda(valorFinal);
+    }
+
+    function salvarNovoCliente() {
+      let nome = document.getElementById('cli-nome').value || 'Cliente sem nome';
+      let objCliente = {
+        ref: document.getElementById('cli-referencia').value,
+        nome: nome,
+        email: document.getElementById('cli-email').value,
+        tel: document.getElementById('cli-telefone').value,
+        cpf: document.getElementById('cli-cpf').value,
+        rg: document.getElementById('cli-rg').value,
+        end: document.getElementById('cli-endereco').value
+      };
+
+      let existe = clientesGlobais.some(c => c.nome.trim().toLowerCase() === nome.trim().toLowerCase());
+      if (!existe) {
+        clientesGlobais.push(objCliente);
+      } else {
+        let idx = clientesGlobais.findIndex(c => c.nome.trim().toLowerCase() === nome.trim().toLowerCase());
+        clientesGlobais[idx] = objCliente;
       }
-      localStorage.setItem('gem_ficha_dados', JSON.stringify(data));
-    }
+      localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
 
-    function carregarEstadoFormulario() {
-      const saved = localStorage.getItem('gem_ficha_dados');
-      if (!saved) return;
-      const data = JSON.parse(saved);
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+        let params = new URLSearchParams({
+          ref: objCliente.ref,
+          nome: objCliente.nome,
+          email: objCliente.email,
+          tel: objCliente.tel,
+          cpf: objCliente.cpf,
+          rg: objCliente.rg,
+          end: objCliente.end
+        }).toString();
 
-      Object.keys(data).forEach(key => {
-        const el = document.getElementById(key);
-        if (el) {
-          if (el.type === 'checkbox') el.checked = data[key];
-          else el.value = data[key];
-        } else {
-          const radios = document.querySelectorAll(`input[name="${key}"]`);
-          radios.forEach(r => {
-            if (r.value === data[key]) r.checked = true;
-          });
-        }
-      });
-
-      if (data['religiao']) atualizarDenominacoes();
-      if (data['denominacao']) document.getElementById('denominacao').value = data['denominacao'];
-
-      if (data['med_auxilio_opt'] === 'Sim') toggleBox('auxilio_box', true);
-      if (data['meds_opt'] === 'Sim') toggleBox('meds_box', true);
-      if (data['plano_opt'] && data['plano_opt'] !== 'Não/SUS') toggleBox('plano_box', true);
-      if (data['alergia_opt'] === 'Sim') toggleBox('alergia_box', true);
-      if (data['deficiencia_opt'] === 'Sim') toggleBox('deficiencia_box', true);
-
-      if (data['assinatura_img']) {
-        const img = new Image();
-        img.onload = function() {
-          ctx.drawImage(img, 0, 0);
-          assinaturaFeita = true;
-        };
-        img.src = data['assinatura_img'];
+        fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        }).then(() => {
+          setTimeout(sincronizarComPlanilha, 1000);
+        });
       }
+
+      alert('Cliente cadastrado com sucesso!');
+      atualizarSelectClientes();
     }
 
-    function limparDados() {
-      if (confirm("Tem certeza que deseja apagar todos os dados preenchidos?")) {
-        localStorage.removeItem('gem_ficha_dados');
-        document.getElementById('cadastroForm').reset();
-        limparAssinatura();
-        forcarMudancaAba('basicas');
-      }
-    }
-
-    function prepararDatasImpressao() {
-      const inputsData = document.querySelectorAll('input[type="date"]');
-      inputsData.forEach(input => {
-        input.dataset.originalVal = input.value;
-        if (input.value && input.value.match(/^\d{4}-\d{2}-\d{2}$/)) {
-          const [yyyy, mm, dd] = input.value.split('-');
-          input.type = 'text';
-          input.value = `${dd}/${mm}/${yyyy}`;
-        }
+    function atualizarSelectClientes() {
+      let select = document.getElementById('select-cliente');
+      select.innerHTML = '<option value="">-- Novo Cliente / Manual --</option>';
+      clientesGlobais.forEach((c, idx) => {
+        select.innerHTML += `<option value="${idx}">${c.nome} (${c.tel || 'Sem Tel'})</option>`;
       });
     }
 
-    function restaurarDatasImpressao() {
-      const inputsData = document.querySelectorAll('input[data-original-val]');
-      inputsData.forEach(input => {
-        input.type = 'date';
-        input.value = input.dataset.originalVal;
-        delete input.dataset.originalVal;
-      });
-    }
+    function excluirClienteSelecionado() {
+      let select = document.getElementById('select-cliente');
+      let idx = select.value;
 
-    async function executarAcao(acao) {
-      if (!validarFormularioCompleto()) return;
-
-      const nome = document.getElementById('nome_completo').value || 'Associado';
-      const nomeArquivo = `Ficha_Inscricao_${nome.replace(/\s+/g, '_')}.pdf`;
-
-      if (acao === 'imprimir') {
-        window.print();
+      if (idx === '' || idx === null || idx === undefined) {
+        alert('Selecione um cliente válido para excluir!');
         return;
       }
 
-      window.scrollTo(0, 0);
-      prepararDatasImpressao();
-      document.body.classList.add('generating-pdf');
+      let c = clientesGlobais[idx];
+      if (!c) {
+        alert('Cliente não encontrado!');
+        return;
+      }
 
-      const elemento = document.body;
-      const opcoes = {
-        margin:       [8, 8, 8, 8],
-        filename:     nomeArquivo,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { 
-          scale: 2, 
-          useCORS: true, 
-          scrollY: 0,
-          scrollX: 0
-        },
-        jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' },
-        pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+      if (confirm(`Deseja realmente excluir o cliente "${c.nome}"?`)) {
+        let nomeExcluido = c.nome;
+        clientesGlobais.splice(idx, 1);
+        localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+
+        if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+          let params = new URLSearchParams({
+            action: 'excluirCliente',
+            nome: nomeExcluido
+          }).toString();
+
+          fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
+            method: 'GET',
+            mode: 'no-cors'
+          });
+        }
+
+        alert('Cliente excluído com sucesso!');
+        atualizarSelectClientes();
+        carregarCliente('');
+      }
+    }
+
+    // Formata qualquer data recebida para o padrão brasileiro DD/MM/AAAA
+    function formatarDataBR(dataStr) {
+      if (!dataStr) return '';
+      if (dataStr.includes('T')) {
+        let parteData = dataStr.split('T')[0];
+        let p = parteData.split('-');
+        if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+      }
+      if (dataStr.includes('-')) {
+        let p = dataStr.split('-');
+        if (p.length === 3 && p[0].length === 4) return `${p[2]}/${p[1]}/${p[0]}`;
+      }
+      return dataStr;
+    }
+
+    function carregarCliente(index) {
+      document.getElementById('cli-referencia').value = '';
+      document.getElementById('cli-nome').value = '';
+      document.getElementById('cli-email').value = '';
+      document.getElementById('cli-telefone').value = '';
+      document.getElementById('cli-cpf').value = '';
+      document.getElementById('cli-rg').value = '';
+      document.getElementById('cli-endereco').value = '';
+
+      document.getElementById('info-validade').value = '';
+      document.getElementById('info-marca').value = '';
+      document.getElementById('info-modelo').value = '';
+      document.getElementById('info-aparelho').value = '';
+      document.getElementById('info-equipamento').value = '';
+      document.getElementById('info-outros').value = '';
+      document.getElementById('info-acessorios').value = '';
+      document.getElementById('info-defeito').value = '';
+      document.getElementById('info-obs').value = '';
+
+      document.getElementById('val-visita').value = '0,00';
+      document.getElementById('desc-visita').value = '0,00';
+      document.getElementById('desc-pecas').value = '0,00';
+      document.getElementById('desc-servicos').value = '0,00';
+
+      document.querySelectorAll('.input-taxa').forEach(input => input.value = '0,00');
+
+      document.getElementById('pag-vista').value = '';
+      document.getElementById('pag-sinal').value = '';
+      document.getElementById('pag-parcelas').value = '';
+
+      document.querySelectorAll('.meio-pag').forEach(chk => chk.checked = false);
+
+      document.getElementById('add-garantia').value = '90 dias conforme termo';
+      document.getElementById('add-anotacoes').value = '';
+      document.getElementById('add-relatorio').value = '';
+      document.getElementById('add-obs').value = '';
+
+      document.getElementById('container-pecas').innerHTML = '';
+      document.getElementById('container-servicos').innerHTML = '';
+      countPeca = 0;
+      countServico = 0;
+
+      if (index === '') {
+        document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
+        const hoje = new Date();
+        document.getElementById('data-pedido').value = String(hoje.getDate()).padStart(2, '0') + '/' + String(hoje.getMonth() + 1).padStart(2, '0') + '/' + hoje.getFullYear();
+        adicionarPeca();
+        adicionarServico();
+        calcularTotais();
+        return;
+      }
+
+      let c = clientesGlobais[index];
+      if (!c) return;
+
+      document.getElementById('cli-referencia').value = c.ref || '';
+      document.getElementById('cli-nome').value = c.nome || '';
+      document.getElementById('cli-email').value = c.email || '';
+      document.getElementById('cli-telefone').value = c.tel || '';
+      document.getElementById('cli-cpf').value = c.cpf || '';
+      document.getElementById('cli-rg').value = c.rg || '';
+      document.getElementById('cli-endereco').value = c.end || '';
+
+      let ultimoPedido = null;
+      for (let i = pedidosGlobais.length - 1; i >= 0; i--) {
+        if (pedidosGlobais[i].cliente && pedidosGlobais[i].cliente.trim().toLowerCase() === c.nome.trim().toLowerCase()) {
+          ultimoPedido = pedidosGlobais[i];
+          break;
+        }
+      }
+
+      if (ultimoPedido) {
+        if (ultimoPedido.num) document.getElementById('numero-pedido').value = ultimoPedido.num;
+        if (ultimoPedido.data) document.getElementById('data-pedido').value = formatarDataBR(ultimoPedido.data);
+
+        document.getElementById('info-validade').value = ultimoPedido.validade || '';
+        document.getElementById('info-marca').value = ultimoPedido.marca || '';
+        document.getElementById('info-modelo').value = ultimoPedido.modelo || '';
+        document.getElementById('info-aparelho').value = ultimoPedido.aparelho || '';
+        document.getElementById('info-equipamento').value = ultimoPedido.equipamento || '';
+        document.getElementById('info-outros').value = ultimoPedido.outros || '';
+        document.getElementById('info-acessorios').value = ultimoPedido.acessorios || '';
+        document.getElementById('info-defeito').value = ultimoPedido.defeito || '';
+        document.getElementById('info-obs').value = ultimoPedido.infoObs || '';
+
+        if (ultimoPedido.valVisita) document.getElementById('val-visita').value = ultimoPedido.valVisita;
+        if (ultimoPedido.descVisita) document.getElementById('desc-visita').value = ultimoPedido.descVisita;
+        if (ultimoPedido.descPecas) document.getElementById('desc-pecas').value = ultimoPedido.descPecas;
+        if (ultimoPedido.descServicos) document.getElementById('desc-servicos').value = ultimoPedido.descServicos;
+
+        let taxasInputs = document.querySelectorAll('.input-taxa');
+        if (taxasInputs.length >= 3) {
+          taxasInputs[0].value = ultimoPedido.taxaEntrega || '0,00';
+          taxasInputs[1].value = ultimoPedido.valorFrete || '0,00';
+          taxasInputs[2].value = ultimoPedido.outrasTaxas || '0,00';
+        }
+
+        if (ultimoPedido.vista) document.getElementById('pag-vista').value = ultimoPedido.vista;
+        if (ultimoPedido.sinal) document.getElementById('pag-sinal').value = formatarMoeda(ultimoPedido.sinal);
+        if (ultimoPedido.parcelas) document.getElementById('pag-parcelas').value = ultimoPedido.parcelas;
+
+        if (ultimoPedido.garantia) document.getElementById('add-garantia').value = ultimoPedido.garantia;
+        if (ultimoPedido.anotacoes) document.getElementById('add-anotacoes').value = ultimoPedido.anotacoes;
+        if (ultimoPedido.relatorio) document.getElementById('add-relatorio').value = ultimoPedido.relatorio;
+        if (ultimoPedido.obs) document.getElementById('add-obs').value = ultimoPedido.obs;
+
+        if (ultimoPedido.pecas) {
+          let listaPecas = Array.isArray(ultimoPedido.pecas) ? ultimoPedido.pecas : ultimoPedido.pecas.split(' | ');
+          listaPecas.forEach(itemStr => {
+            if (!itemStr.trim()) return;
+            adicionarPeca();
+            let row = document.getElementById(`peca-row-${countPeca}`);
+            if (row) {
+              let qtdMatch = itemStr.match(/^(\d+)x\s+/);
+              let qtd = qtdMatch ? qtdMatch[1] : '1';
+              let valMatch = itemStr.match(/\(R\$\s*([\d.,]+)\)/);
+              let val = valMatch ? valMatch[1] : '0,00';
+              let desc = itemStr.replace(/^(\d+)x\s+/, '').replace(/\s+\(R\$\s*[\d.,]+\)/, '').trim();
+
+              row.querySelector('.peca-qtd').value = qtd;
+              row.querySelector('.peca-desc').value = desc;
+              row.querySelector('.peca-val').value = val;
+            }
+          });
+        }
+
+        if (ultimoPedido.servicos) {
+          let listaServicos = Array.isArray(ultimoPedido.servicos) ? ultimoPedido.servicos : ultimoPedido.servicos.split(' | ');
+          listaServicos.forEach(itemStr => {
+            if (!itemStr.trim()) return;
+            adicionarServico();
+            let row = document.getElementById(`servico-row-${countServico}`);
+            if (row) {
+              let valMatch = itemStr.match(/\(R\$\s*([\d.,]+)\)/);
+              let val = valMatch ? valMatch[1] : '0,00';
+              let desc = itemStr.replace(/\s+\(R\$\s*[\d.,]+\)/, '').trim();
+
+              row.querySelector('.serv-desc').value = desc;
+              row.querySelector('.serv-val').value = val;
+            }
+          });
+        }
+
+        if (ultimoPedido.meios) {
+          let meiosArr = Array.isArray(ultimoPedido.meios) ? ultimoPedido.meios : ultimoPedido.meios.split(', ');
+          document.querySelectorAll('.meio-pag').forEach(chk => {
+            chk.checked = meiosArr.some(m => m.trim().toLowerCase() === chk.value.trim().toLowerCase());
+          });
+        }
+
+        if (countPeca === 0) adicionarPeca();
+        if (countServico === 0) adicionarServico();
+
+        calcularTotais();
+      } else {
+        document.getElementById('numero-pedido').value = gerarProximoNumeroNovoPedido();
+        adicionarPeca();
+        adicionarServico();
+        calcularTotais();
+      }
+    }
+
+    function salvarPedidoHistorico() {
+      let num = document.getElementById('numero-pedido').value || '000';
+      let cliente = document.getElementById('cli-nome').value || 'CLIENTE NÃO INFORMADO';
+      let ref = document.getElementById('cli-referencia').value || '';
+      let infoObs = document.getElementById('info-obs').value || '';
+      let totalLiquido = parseMoeda(document.getElementById('valor-total-final').value);
+      let sinalEntrada = parseMoeda(document.getElementById('pag-sinal').value);
+      let subtotal = parseMoeda(document.getElementById('subtotal-geral').value);
+      let desconto = parseMoeda(document.getElementById('total-desconto').value);
+      let taxas = parseMoeda(document.getElementById('total-taxas').value);
+
+      let tasasInputs = document.querySelectorAll('.input-taxa');
+
+      let pecasArray = [];
+      document.querySelectorAll('#container-pecas .dynamic-row').forEach(row => {
+        let desc = row.querySelector('.peca-desc').value;
+        let qtd = row.querySelector('.peca-qtd').value;
+        let tot = row.querySelector('.peca-tot').value;
+        if (desc) pecasArray.push(`${qtd}x ${desc} (R$ ${tot})`);
+      });
+
+      let servicosArray = [];
+      document.querySelectorAll('#container-servicos .dynamic-row').forEach(row => {
+        let desc = row.querySelector('.serv-desc').value;
+        let val = row.querySelector('.serv-val').value;
+        if (desc) servicosArray.push(`${desc} (R$ ${val})`);
+      });
+
+      let meios = [];
+      document.querySelectorAll('.meio-pag:checked').forEach(c => meios.push(c.value));
+
+      let saldoInicial = totalLiquido - sinalEntrada;
+      if (saldoInicial < 0) saldoInicial = 0;
+
+      let historicoInicial = [];
+      if (sinalEntrada > 0) {
+        historicoInicial.push({
+          data: new Date().toLocaleDateString('pt-BR'),
+          valor: sinalEntrada,
+          forma: 'Sinal / Entrada'
+        });
+      }
+
+      let objPedido = {
+        num: num,
+        data: document.getElementById('data-pedido').value,
+        ref: ref,
+        cliente: cliente,
+        email: document.getElementById('cli-email').value,
+        tel: document.getElementById('cli-telefone').value,
+        cpf: document.getElementById('cli-cpf').value,
+        rg: document.getElementById('cli-rg').value,
+        end: document.getElementById('cli-endereco').value,
+        validade: document.getElementById('info-validade').value,
+        marca: document.getElementById('info-marca').value,
+        modelo: document.getElementById('info-modelo').value,
+        aparelho: document.getElementById('info-aparelho').value,
+        equipamento: document.getElementById('info-equipamento').value,
+        outros: document.getElementById('info-outros').value,
+        acessorios: document.getElementById('info-acessorios').value,
+        infoObs: infoObs,
+        defeito: document.getElementById('info-defeito').value,
+        pecas: pecasArray,
+        servicos: servicosArray,
+        valVisita: document.getElementById('val-visita').value,
+        descVisita: document.getElementById('desc-visita').value,
+        descPecas: document.getElementById('desc-pecas').value,
+        descServicos: document.getElementById('desc-servicos').value,
+        totalDesconto: document.getElementById('total-desconto').value,
+        taxaEntrega: tasasInputs[0] ? tasasInputs[0].value : '0,00',
+        valorFrete: tasasInputs[1] ? tasasInputs[1].value : '0,00',
+        outrasTaxas: tasasInputs[2] ? tasasInputs[2].value : '0,00',
+        totalTaxas: document.getElementById('total-taxas').value,
+        subtotal: formatarMoeda(subtotal),
+        total: totalLiquido,
+        saldo: saldoInicial,
+        vista: document.getElementById('pag-vista').value,
+        sinal: document.getElementById('pag-sinal').value,
+        parcelas: document.getElementById('pag-parcelas').value,
+        meios: meios,
+        garantia: document.getElementById('add-garantia').value,
+        anotacoes: document.getElementById('add-anotacoes').value,
+        relatorio: document.getElementById('add-relatorio').value,
+        obs: document.getElementById('add-obs').value,
+        historico: historicoInicial
       };
 
-      try {
-        if (acao === 'compartilhar') {
-          const pdfBlob = await html2pdf().set(opcoes).from(elemento).output('blob');
-          const file = new File([pdfBlob], nomeArquivo, { type: 'application/pdf' });
+      let cExisteLocal = clientesGlobais.some(c => c.nome && c.nome.trim().toLowerCase() === cliente.trim().toLowerCase());
+      if (!cExisteLocal && cliente !== 'CLIENTE NÃO INFORMADO') {
+        clientesGlobais.push({
+          ref: ref,
+          nome: cliente,
+          email: objPedido.email,
+          tel: objPedido.tel,
+          cpf: objPedido.cpf,
+          rg: objPedido.rg,
+          end: objPedido.end
+        });
+        localStorage.setItem('donzamb_clientes', JSON.stringify(clientesGlobais));
+        atualizarSelectClientes();
+      }
 
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              title: 'Ficha de Inscrição GEM 350 SP',
-              text: `Segue a Ficha de Inscrição de ${nome}`,
-              files: [file]
-            });
-          } else {
-            alert('Seu navegador não suporta compartilhamento direto de arquivos. Utilize a opção "Salvar PDF".');
-          }
+      let idxExistente = pedidosGlobais.findIndex(p => p.num && p.num.trim() === num.trim());
+      if (idxExistente !== -1) {
+        pedidosGlobais[idxExistente] = Object.assign({}, pedidosGlobais[idxExistente], objPedido);
+      } else {
+        pedidosGlobais.push(objPedido);
+      }
+      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
+
+      let numLimpo = parseInt(num.split('-')[0]);
+      if (!isNaN(numLimpo)) {
+        let proximoNum = Math.max(numLimpo + 1, parseInt(localStorage.getItem('donzamb_num_pedido') || '1'));
+        localStorage.setItem('donzamb_num_pedido', proximoNum);
+      }
+
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('http')) {
+        let params = new URLSearchParams({
+          num: objPedido.num,
+          data: objPedido.data,
+          ref: objPedido.ref,
+          nome: objPedido.cliente,
+          email: objPedido.email,
+          tel: objPedido.tel,
+          cpf: objPedido.cpf,
+          rg: objPedido.rg,
+          end: objPedido.end,
+          validade: objPedido.validade,
+          marca: objPedido.marca,
+          modelo: objPedido.modelo,
+          aparelho: objPedido.aparelho,
+          equipamento: objPedido.equipamento,
+          outros: objPedido.outros,
+          acessorios: objPedido.acessorios,
+          infoObs: objPedido.infoObs,
+          defeito: objPedido.defeito,
+          pecas: pecasArray.join(' | '),
+          servicos: servicosArray.join(' | '),
+          valVisita: objPedido.valVisita,
+          descVisita: objPedido.descVisita,
+          descPecas: objPedido.descPecas,
+          descServicos: objPedido.descServicos,
+          totalDesconto: objPedido.totalDesconto,
+          taxaEntrega: objPedido.taxaEntrega,
+          valorFrete: objPedido.valorFrete,
+          outrasTaxas: objPedido.outrasTaxas,
+          totalTaxas: objPedido.totalTaxas,
+          subtotal: objPedido.subtotal,
+          total: formatarMoeda(totalLiquido),
+          vista: objPedido.vista,
+          sinal: formatarMoeda(sinalEntrada),
+          parcelas: objPedido.parcelas,
+          pagamento: meios.join(', ') + (objPedido.parcelas ? ` (${objPedido.parcelas})` : ''),
+          garantia: objPedido.garantia,
+          anotacoes: objPedido.anotacoes,
+          relatorio: objPedido.relatorio,
+          obs: objPedido.obs
+        }).toString();
+
+        fetch(`${GOOGLE_SCRIPT_URL}?${params}`, {
+          method: 'GET',
+          mode: 'no-cors'
+        }).then(() => {
+          setTimeout(sincronizarComPlanilha, 1500);
+        });
+      }
+
+      alert(`Pedido ${num} salvo e sincronizado com a planilha! Saldo restante: R$ ${formatarMoeda(saldoInicial)}`);
+      atualizarSelectPedidosRecibo();
+    }
+    
+    function imprimirOS() {
+      let cliente = document.getElementById('cli-nome').value.trim() || 'CLIENTE';
+      document.title = `ORÇAMENTO ${cliente.toUpperCase()}`;
+      document.body.classList.remove('printing-recibo');
+      document.body.classList.remove('printing-nota');
+      prepararTextosParaImpressao();
+      window.print();
+      setTimeout(() => { document.title = "DONZAMB@ - Gestão de Pedidos e Documentos"; }, 1000);
+    }
+
+    function imprimirRecibo() {
+      let cliente = document.getElementById('recibo-cliente').value.trim() || 'CLIENTE';
+      document.title = `RECIBO ${cliente.toUpperCase()}`;
+      document.body.classList.remove('printing-nota');
+      document.body.classList.add('printing-recibo');
+      window.print();
+      setTimeout(() => { 
+        document.title = "DONZAMB@ - Gestão de Pedidos e Documentos"; 
+        document.body.classList.remove('printing-recibo');
+      }, 1000);
+    }
+
+    function imprimirNotaServico() {
+      let idx = document.getElementById('select-pedido-recibo').value;
+      if (idx === '') { alert('Selecione um pedido salvo primeiro!'); return; }
+
+      let p = pedidosGlobais[idx];
+
+      let html = `<p><strong>PEDIDO Nº:</strong> ${p.num} | <strong>DATA:</strong> ${p.data || new Date().toLocaleDateString('pt-BR')}</p>`;
+      html += `<hr style="margin: 6px 0;">`;
+      html += `<p><strong>CLIENTE:</strong> ${p.cliente} | <strong>E-MAIL:</strong> ${p.email || '---'} | <strong>TEL:</strong> ${p.tel || '---'} | <strong>CPF:</strong> ${p.cpf || '---'}</p>`;
+      html += `<p><strong>ENDEREÇO:</strong> ${p.end || '---'}</p>`;
+      html += `<hr style="margin: 6px 0;">`;
+      html += `<p><strong>EQUIPAMENTO:</strong> ${p.aparelho || ''} ${p.marca || ''} ${p.modelo || ''}</p>`;
+      html += `<p><strong>ACESSÓRIOS:</strong> ${p.acessorios || 'Nenhum'}</p>`;
+      html += `<p><strong>DEFEITO / OBS:</strong> ${p.defeito || '---'}</p>`;
+      html += `<hr style="margin: 6px 0;">`;
+
+      html += `<p><strong>PEÇAS E COMPONENTES:</strong></p><ul>`;
+      if (p.pecas && p.pecas.length > 0) {
+        if (Array.isArray(p.pecas)) {
+          p.pecas.forEach(item => { html += `<li>${item.qtd ? item.qtd + 'x ' : ''}${item.desc || item} - R$ ${item.tot || ''}</li>`; });
         } else {
-          await html2pdf().set(opcoes).from(elemento).save();
+          html += `<li>${p.pecas}</li>`;
         }
-      } catch (erro) {
-        console.error(erro);
-        alert('Não foi possível gerar o arquivo PDF. Utilizando a impressão padrão do navegador...');
-        window.print();
-      } finally {
-        document.body.classList.remove('generating-pdf');
-        restaurarDatasImpressao();
-        forcarMudancaAba(abaAtual);
+      } else { html += `<li>Nenhuma peça cadastrada</li>`; }
+      html += `</ul>`;
+
+      html += `<p style="margin-top:6px;"><strong>SERVIÇOS EXECUTADOS:</strong></p><ul>`;
+      if (p.servicos && p.servicos.length > 0) {
+        if (Array.isArray(p.servicos)) {
+          p.servicos.forEach(s => { html += `<li>${s.desc || s} - R$ ${s.val || ''}</li>`; });
+        } else {
+          html += `<li>${p.servicos}</li>`;
+        }
+      } else { html += `<li>Nenhum serviço cadastrado</li>`; }
+      html += `</ul>`;
+
+      html += `<hr style="margin: 6px 0;">`;
+      html += `<p><strong>VALOR TOTAL LÍQUIDO:</strong> R$ ${formatarMoeda(p.total)}</p>`;
+      html += `<p><strong>PAGAMENTO COMBINADO:</strong> Entrada: R$ ${p.sinal || '0,00'} | Parcelamento: ${p.parcelas || 'À vista'} | Meios: ${p.meios ? (Array.isArray(p.meios) ? p.meios.join(', ') : p.meios) : 'Pix/Dinheiro'}</p>`;
+      html += `<p><strong>GARANTIA:</strong> ${p.garantia || '90 dias conforme termo'}</p>`;
+
+      document.getElementById('nota-detalhes-conteudo').innerHTML = html;
+
+      document.title = `NOTA SERVIÇO ${(p.cliente || 'CLIENTE').toUpperCase()}`;
+      document.body.classList.remove('printing-recibo');
+      document.body.classList.add('printing-nota');
+      window.print();
+      setTimeout(() => { 
+        document.title = "DONZAMB@ - Gestão de Pedidos e Documentos"; 
+        document.body.classList.remove('printing-nota');
+      }, 1000);
+    }
+
+    function compartilharWhatsAppOS() {
+      let num = document.getElementById('numero-pedido').value || '';
+      let cliente = document.getElementById('cli-nome').value || 'Cliente';
+      let total = document.getElementById('valor-total-final').value || '0,00';
+
+      let msg = `*DONZAMB@ - Soluções Técnicas em T.I.*\n`;
+      msg += `*ORDEM DE SERVIÇO / ORÇAMENTO nº ${num}*\n\n`;
+      msg += `*Cliente:* ${cliente}\n`;
+      msg += `*VALOR TOTAL LÍQUIDO:* R$ ${total}\n\n`;
+      msg += `WhatsApp: (11) 9 6083-4022 | TEL: (11) 9 4077-4175`;
+
+      let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    function atualizarSelectPedidosRecibo() {
+      let select = document.getElementById('select-pedido-recibo');
+      select.innerHTML = '<option value="">-- Selecione um Pedido --</option>';
+      pedidosGlobais.forEach((p, idx) => {
+        select.innerHTML += `<option value="${idx}">Pedido: ${p.num} - Cliente: ${p.cliente}</option>`;
+      });
+    }
+
+    function carregarDadosPedidoRecibo(idx) {
+      if (idx === '') {
+        document.getElementById('recibo-cliente').value = '';
+        document.getElementById('recibo-val-total').value = '';
+        document.getElementById('recibo-saldo-devedor').value = '';
+        document.getElementById('historico-pagamentos').innerHTML = '<p style="color: var(--text-muted);">Nenhum pedido selecionado.</p>';
+        return;
+      }
+      let p = pedidosGlobais[idx];
+      if (p) {
+        document.getElementById('recibo-cliente').value = p.cliente;
+        document.getElementById('recibo-val-total').value = formatarMoeda(p.total);
+        document.getElementById('recibo-saldo-devedor').value = formatarMoeda(p.saldo);
+
+        document.getElementById('recibo-p-cliente').innerText = p.cliente;
+        document.getElementById('recibo-p-num').innerText = p.num;
+        document.getElementById('recibo-p-saldo').innerText = `R$ ${formatarMoeda(p.saldo)}`;
+        document.getElementById('recibo-p-data').innerText = p.data || new Date().toLocaleDateString('pt-BR');
+
+        renderizarHistoricoRecibos(p);
+      }
+    }
+
+    function darBaixaPagamento() {
+      let idx = document.getElementById('select-pedido-recibo').value;
+      if (idx === '') { alert('Selecione um pedido salvo!'); return; }
+
+      let valPagto = parseMoeda(document.getElementById('recibo-val-pagamento').value);
+      let forma = document.getElementById('recibo-forma-pagamento').value;
+
+      if (valPagto <= 0) { alert('Informe um valor de pagamento válido!'); return; }
+
+      let p = pedidosGlobais[idx];
+
+      p.saldo = parseMoeda(p.saldo) - valPagto;
+      if (p.saldo < 0) p.saldo = 0;
+
+      if (!p.historico) p.historico = [];
+      p.historico.push({
+        data: new Date().toLocaleDateString('pt-BR'),
+        valor: valPagto,
+        forma: forma
+      });
+
+      pedidosGlobais[idx] = p;
+      localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
+
+      document.getElementById('recibo-p-valor').innerText = `R$ ${formatarMoeda(valPagto)}`;
+      document.getElementById('recibo-p-saldo').innerText = `R$ ${formatarMoeda(p.saldo)}`;
+
+      alert('Baixa de pagamento registrada!');
+      carregarDadosPedidoRecibo(idx);
+    }
+
+    function excluirPedidoSalvo() {
+      let idx = document.getElementById('select-pedido-recibo').value;
+      if (idx === '') { alert('Selecione um pedido!'); return; }
+
+      let p = pedidosGlobais[idx];
+
+      if (confirm(`Excluir o pedido nº ${p.num} do cliente ${p.cliente}?`)) {
+        pedidosGlobais.splice(idx, 1);
+        localStorage.setItem('donzamb_pedidos', JSON.stringify(pedidosGlobais));
+        alert('Pedido excluído localmente!');
+        atualizarSelectPedidosRecibo();
+        carregarDadosPedidoRecibo('');
+      }
+    }
+
+    function compartilharWhatsAppRecibo() {
+      let cliente = document.getElementById('recibo-cliente').value || 'Cliente';
+      let valPagto = parseMoeda(document.getElementById('recibo-val-pagamento').value);
+      let saldo = document.getElementById('recibo-saldo-devedor').value || '0,00';
+
+      let msg = `*DONZAMB@ - Soluções Técnicas em T.I.*\n`;
+      msg += `*RECIBO DE PAGAMENTO*\n\n`;
+      msg += `Confirmamos o recebimento do pagamento de *R$ ${formatarMoeda(valPagto)}* referente ao cliente *${cliente}*.\n`;
+      msg += `*Saldo Restante:* R$ ${saldo}\n\n`;
+      msg += `Agradecemos a preferência!`;
+
+      let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
+    }
+
+    function renderizarHistoricoRecibos(pedido) {
+      let div = document.getElementById('historico-pagamentos');
+      if (!pedido || !pedido.historico || pedido.historico.length === 0) {
+        div.innerHTML = '<p style="color: var(--text-muted);">Nenhum pagamento registrado.</p>';
+        return;
+      }
+
+      let html = '<table style="width:100%; text-align:left; border-collapse:collapse;">';
+      html += '<tr style="border-bottom:1px solid #555;"><th>Data</th><th>Forma</th><th>Valor Pago</th></tr>';
+      pedido.historico.forEach(h => {
+        html += `<tr style="border-bottom:1px solid #333; height:30px;">
+          <td>${h.data}</td>
+          <td>${h.forma}</td>
+          <td style="color:var(--accent-orange);">R$ ${formatarMoeda(h.valor)}</td>
+        </tr>`;
+      });
+      html += '</table>';
+      div.innerHTML = html;
+    }
+
+    function limparFormularioComConfirmacao() {
+      if (confirm('Deseja realmente LIMPAR DADOS?')) {
+        location.reload();
       }
     }
   </script>
